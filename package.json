@@ -4,7 +4,8 @@
   "description": "mom says it's my turn to write a discord bot",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "prepare": "husky install"
   },
   "author": "skuo",
   "license": "ISC",
@@ -20,6 +21,7 @@
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.1",
+    "husky": "^8.0.3",
     "lint-staged": "^15.1.0",
     "typescript": "^5.1.6"
   }
