@@ -8,5 +8,3 @@ client.once(Events.ClientReady, (c) => {
 });
 
 client.login(config.token);
-
-  // test change
