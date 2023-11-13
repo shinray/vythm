@@ -2,4 +2,4 @@ node_modules/
 .env
 # config.json # I'll actually commit it, at least initially.
 dist/
-*.js
+# *.js
