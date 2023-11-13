@@ -36,7 +36,7 @@ export default class Interaction {
     toJSON(): RESTPostAPIApplicationCommandsJSONBody {
         const command = new SlashCommandBuilder()
             .setName(this.name)
-            .setDescription(this.description!);
+            .setDescription(this.description);
 
         command.setDMPermission(this.dmPermission);
 

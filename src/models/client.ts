@@ -8,6 +8,7 @@ export default class DiscordClient extends Client {
 
     // client Ready event will actually initialize and register everything.
     public events = new EventHandler(this);
+
     public interactions = new InteractionHandler(this);
 
     constructor() {

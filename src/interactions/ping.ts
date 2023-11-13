@@ -1,20 +1,5 @@
-import { CommandInteraction, SlashCommandBuilder } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
 import Interaction from '../models/Interaction';
-
-// const data = new SlashCommandBuilder()
-//     .setName('ping')
-//     .setDescription('Replies with Pong!');
-
-// const execute = async (interaction) => {
-//     console.debug('ping received ', interaction);
-//     try {
-//         await interaction.reply('Pong!');
-//     } catch (e) {
-//         console.error('ping reply error ', e);
-//     }
-// };
-
-// export { data, execute };
 
 export default class Ping extends Interaction {
     name = 'ping';
