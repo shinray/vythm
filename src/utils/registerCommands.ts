@@ -3,7 +3,7 @@ import config from '../config.json';
 
 // TODO: implement version that refreshes on a per-guild basis.
 // Arguably useless since this bot should not be widely distributed.
-const registerCommands = async (commands) => {
+const registerCommands = async (commands: any[]) => {
     const body = commands.map((c) => c.toJSON());
     const rest = new REST().setToken(config.token);
     const { clientId } = config;

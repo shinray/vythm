@@ -2,13 +2,35 @@ module.exports = {
     parser: '@typescript-eslint/parser',
     parserOptions: {
         ecmaVersion: 2021,
+        sourceType: 'module',
+        project: './tsconfig.json',
     },
     extends: [
-        // "eslint:recommended",
+        'eslint:recommended',
         'airbnb-base',
+        'plugin:@typescript-eslint/recommended',
         'prettier',
     ],
-    plugins: ['prettier'],
+    plugins: ['@typescript-eslint', 'prettier'],
+    overrides: [
+        {
+            extends: [
+                'plugin:@typescript-eslint/recommended-requiring-type-checking',
+            ],
+            files: ['./**/*.{ts,tsx}'],
+            parser: '@typescript-eslint/parser',
+            parserOptions: {
+                ecmaVersion: 2021,
+                sourceType: 'module',
+                project: './tsconfig.json',
+            },
+            // TypeScript-specific rules
+        },
+        {
+            files: ['*.js'],
+            // JavaScript-specific rules
+        },
+    ],
     env: {
         node: true,
         es6: true,
@@ -34,6 +56,19 @@ module.exports = {
         // eqeqeq: ['error', 'always', { null: 'ignore' }],
         'no-console': 'off',
         'prettier/prettier': ['error'],
+        // 'import/extensions': [
+        //     'error',
+        //     'ignorePackages',
+        //     {
+        //         js: 'never',
+        //         ts: 'never',
+        //         tsx: 'never',
+        //     },
+        // ],
+        'import/extensions': 'off',
+        'import/no-unresolved': 'off', // Disable this rule as TypeScript will handle it
+        'import/prefer-default-export': 'off', // Allowing single exports for simplicity
+        '@typescript-eslint/explicit-module-boundary-types': 'off', // Allowing implicit return types for simplicity
         quotes: ['error', 'single'],
     },
 };
