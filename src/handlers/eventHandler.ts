@@ -11,10 +11,9 @@ export default class EventHandler extends Collection<string, DiscordEvent> {
     constructor(client: DiscordClient) {
         super();
         this.client = client;
-        this.init();
     }
 
-    private init = async () => {
+    init = async () => {
         const folder = 'events';
         const path = join(__dirname, '..', folder);
         const files = loadCommandModules(path);

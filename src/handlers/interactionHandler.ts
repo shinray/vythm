@@ -15,10 +15,9 @@ export default class InteractionHandler extends Collection<
     constructor(client: DiscordClient) {
         super();
         this.client = client;
-        this.init();
     }
 
-    private init = async () => {
+    init = async () => {
         const folder = 'interactions';
         const path = join(__dirname, '..', folder);
         const files = loadCommandModules(path);
