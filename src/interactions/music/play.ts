@@ -2,7 +2,7 @@ import { CommandInteraction } from 'discord.js';
 import Interaction from '../../models/Interaction';
 
 // TODO: placeholder
-export default class Play extends Interaction {
+export default class Play extends Interaction<CommandInteraction> {
     name = 'play';
 
     description = 'play with me (PLACEHOLDER)';
@@ -26,6 +26,6 @@ export default class Play extends Interaction {
                 break;
         }
         console.debug(response);
-        return interaction.editReply(response);
+        await interaction.editReply(response);
     };
 }

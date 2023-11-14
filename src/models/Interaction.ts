@@ -1,5 +1,6 @@
 import {
     ApplicationCommandOptionBase,
+    BaseInteraction,
     RESTPostAPIApplicationCommandsJSONBody,
     SlashCommandBuilder,
 } from 'discord.js';
@@ -12,7 +13,7 @@ import DiscordClient from './client';
  * and the handler will always be initialized on application boot.
  * TODO: Should this be abstract?
  */
-export default class Interaction {
+export default class Interaction<T extends BaseInteraction = BaseInteraction> {
     readonly client: DiscordClient;
 
     name: string = '';
@@ -23,7 +24,8 @@ export default class Interaction {
 
     dmPermission: boolean | undefined;
 
-    execute = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
+    execute = async (interaction: T): Promise<void> => {
         console.error(
             `Attempted to call execute() on an Interaction with no implementation ${this.name}`,
         );
