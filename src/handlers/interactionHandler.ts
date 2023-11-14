@@ -4,6 +4,7 @@ import DiscordClient from '../models/client';
 import Interaction from '../models/Interaction';
 import loadCommandModules from '../utils/loadCommandModules';
 import config from '../config.json';
+import { InteractionConstructor } from '../types/definitions';
 
 export default class InteractionHandler extends Collection<
     string,
@@ -25,7 +26,9 @@ export default class InteractionHandler extends Collection<
 
         await Promise.all(
             files.map(async (file) => {
-                const module = await import(file);
+                const module = (await import(file)) as {
+                    default: InteractionConstructor<Interaction>;
+                };
                 const InteractionClass = module.default;
                 if (
                     InteractionClass &&
