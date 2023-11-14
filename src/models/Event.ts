@@ -1,6 +1,6 @@
 import DiscordClient from './client';
 
-export default class Event {
+export default class DiscordEvent {
     readonly client: DiscordClient;
 
     name: string = '';

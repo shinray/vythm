@@ -1,7 +1,7 @@
 import { Interaction } from 'discord.js';
-import Event from '../models/Event';
+import DiscordEvent from '../models/Event';
 
-export default class InteractionCreate extends Event {
+export default class InteractionCreate extends DiscordEvent {
     name = 'interactionCreate';
 
     execute = async (interaction: Interaction) => {
@@ -9,6 +9,6 @@ export default class InteractionCreate extends Event {
 
         await interaction.deferReply();
         const command = this.client.interactions.get(interaction.commandName);
-        return command!.execute(interaction);
+        command!.execute(interaction);
     };
 }

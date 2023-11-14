@@ -1,8 +1,8 @@
 import { ActivityType } from 'discord.js';
 import DiscordClient from '../models/client';
-import Event from '../models/Event';
+import DiscordEvent from '../models/Event';
 
-export default class Ready extends Event {
+export default class Ready extends DiscordEvent {
     name = 'ready';
 
     once = true;
