@@ -1,4 +1,5 @@
 import {
+    ApplicationCommandOptionBase,
     RESTPostAPIApplicationCommandsJSONBody,
     SlashCommandBuilder,
 } from 'discord.js';
@@ -18,7 +19,7 @@ export default class Interaction {
 
     description: string = 'No description provided.';
 
-    options: any[] = [];
+    options: ApplicationCommandOptionBase[] = [];
 
     dmPermission: boolean | undefined;
 
