@@ -22,7 +22,7 @@ export default class Interaction {
 
     dmPermission: boolean | undefined;
 
-    execute: Function = () => {
+    execute = () => {
         console.error(
             `Attempted to call execute() on an Interaction with no implementation ${this.name}`,
         );

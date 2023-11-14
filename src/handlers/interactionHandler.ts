@@ -3,7 +3,6 @@ import { join } from 'path';
 import DiscordClient from '../models/client';
 import Interaction from '../models/Interaction';
 import loadCommandModules from '../utils/loadCommandModules';
-import registerCommands from '../utils/registerCommands';
 import config from '../config.json';
 
 export default class InteractionHandler extends Collection<

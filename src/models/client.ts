@@ -21,6 +21,16 @@ export default class DiscordClient extends Client {
             ],
         });
 
-        this.login(config.token);
+        this.init();
     }
+
+    private init = () => {
+        this.login(config.token)
+            .then(() => {
+                console.log('Login successful.');
+            })
+            .catch((error) => {
+                console.error('Error on client login: ', error);
+            });
+    };
 }
