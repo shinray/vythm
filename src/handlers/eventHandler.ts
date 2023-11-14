@@ -22,10 +22,9 @@ export default class EventHandler extends Collection<string, Event> {
             files.map(async (file) => {
                 const module = await import(file);
                 const EventClass = module.default;
-                console.debug('event module', EventClass);
                 if (EventClass && EventClass.prototype instanceof Event) {
                     const event = new EventClass(this.client);
-                    console.debug('event', event);
+                    console.debug('loading event module', event.name);
                     this.set(event.name, event);
                     this.client[event.once ? 'once' : 'on'](
                         event.name,

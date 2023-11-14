@@ -28,13 +28,12 @@ export default class InteractionHandler extends Collection<
             files.map(async (file) => {
                 const module = await import(file);
                 const InteractionClass = module.default;
-                console.debug('module', InteractionClass);
                 if (
                     InteractionClass &&
                     InteractionClass.prototype instanceof Interaction
                 ) {
                     const command = new InteractionClass(this.client);
-                    console.debug('command', command);
+                    console.debug('loading command', command.name);
                     this.set(command.name, command);
                 } else {
                     console.error(`Error loading command ${file}`);
