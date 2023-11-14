@@ -8,7 +8,8 @@ export default class Ready extends DiscordEvent {
     once = true;
 
     // eslint-disable-next-line class-methods-use-this
-    execute = async (client: DiscordClient): Promise<void> => {
+    execute = async (...args: unknown[]): Promise<void> => {
+        const client = args[0] as DiscordClient;
         // Push command list to Discord API
         await client.interactions.deploy();
         client.user?.setPresence({

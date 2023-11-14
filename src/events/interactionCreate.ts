@@ -4,11 +4,12 @@ import DiscordEvent from '../models/Event';
 export default class InteractionCreate extends DiscordEvent {
     name = 'interactionCreate';
 
-    execute = async (interaction: Interaction) => {
+    execute = async (...args: unknown[]) => {
+        const interaction = args[0] as Interaction;
         if (!interaction.isChatInputCommand()) return;
 
         await interaction.deferReply();
         const command = this.client.interactions.get(interaction.commandName);
-        command!.execute(interaction);
+        await command!.execute(interaction);
     };
 }

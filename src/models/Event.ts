@@ -8,7 +8,7 @@ export default class DiscordEvent {
     once: boolean = false;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    execute = (..._args: unknown[]) => {
+    execute = (..._args: unknown[]): Promise<void> => {
         console.error(
             `Attempted to call execute() on an Event with no implementation ${this.name}`,
         );
