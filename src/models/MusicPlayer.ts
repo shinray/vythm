@@ -1,3 +1,9 @@
+/* eslint @typescript-eslint/no-unsafe-return: "warn" */
+/* eslint @typescript-eslint/no-unsafe-member-access: "warn" */
+/* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
+/* eslint @typescript-eslint/no-explicit-any: "warn" */
+/* eslint @typescript-eslint/require-await: "warn" */
+// TODO: replace 'any'
 /**
  * What does MusicPlayer need to do?
  * * Unique to guild
@@ -9,6 +15,7 @@
  * * handle timeout/idle
  * * play
  * * pause
+ * * seek
  * * loop
  * * next
  * * prev
@@ -18,15 +25,18 @@
  * * add/insert/queue
  * * remove
  * * shuffle
+ * * get/set quality level [ 0 = Lowest, 1 = Medium, 2 = Highest ]
  */
 import {
     AudioPlayer,
+    AudioPlayerStatus,
     NoSubscriberBehavior,
     VoiceConnection,
     joinVoiceChannel,
 } from '@discordjs/voice';
 import { VoiceChannel } from 'discord.js';
 import DiscordClient from './client';
+import { LoopMode } from '../types/definitions';
 
 export default class MusicPlayer extends AudioPlayer {
     readonly client: DiscordClient;
@@ -36,6 +46,13 @@ export default class MusicPlayer extends AudioPlayer {
     channelId: string | undefined;
 
     voiceChannelId: string | undefined;
+
+    tracks: any[] = [];
+
+    // Track position index
+    trackAt: number = 0;
+
+    loopMode: LoopMode = 'off';
 
     idleTimer = 60000;
 
@@ -70,6 +87,55 @@ export default class MusicPlayer extends AudioPlayer {
         this.connection?.destroy();
         this.connection = undefined;
         this.voiceChannelId = undefined;
+    };
+
+    add = async (track: any) => {
+        this.tracks.push(track);
+
+        // If we're not playing anything, start playing.
+        if (
+            this.tracks.length === 1 ||
+            this.state.status === AudioPlayerStatus.Idle
+        ) {
+            this.trackAt = this.tracks.length;
+            // await this.play(track);
+        }
+
+        // Probably not strictly necessary to return tracklength.
+        return this.tracks.length;
+    };
+
+    remove = (trackNumber: number) => {
+        if (trackNumber < 0) return;
+
+        // Get currently playing, if applicable
+        let track: any;
+        if (this.trackAt !== 0) {
+            track = this.tracks[this.trackAt - 1];
+        }
+
+        this.tracks.splice(trackNumber - 1, 1);
+
+        // Update current track position, if applicable
+        if (track) {
+            this.trackAt = this.tracks.findIndex((t) => t.id === track.id) + 1;
+        }
+    };
+
+    // Returns track data - useful for some cases where context is required
+    // play = async (track) => {
+    //     super.play();
+    //     return track;
+    // };
+
+    stop = (force?: boolean | undefined): boolean => {
+        this.stopCalled = true;
+        return super.stop(force);
+    };
+
+    // Attempts to parse mode string
+    setLoop = (mode: string) => {
+        this.loopMode = (mode as LoopMode) || 'off';
     };
 
     setTimeout = () => {

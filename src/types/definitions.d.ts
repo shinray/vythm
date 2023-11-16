@@ -8,3 +8,5 @@ export type EventConstructor<T extends DiscordEvent> = new (
 export type InteractionConstructor<T extends Interaction> = new (
     client: DiscordClient,
 ) => T;
+
+export type LoopMode = 'off' | 'current' | 'all';
