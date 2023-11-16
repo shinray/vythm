@@ -3,8 +3,9 @@
 A discord bot in Node.js
 
 ## Requirements
-- Node 16
-- Discord.js
+
+-   Node 16
+-   Discord.js
 
 ## Notes
 
@@ -25,7 +26,7 @@ are emitted by Client and need to be handled with an event handler
 
 ## TODO
 
-- clean up comments
-- set up dotenv for secrets 
-- actually import dl library and do the work 
-- add unit testing
+-   clean up comments
+-   set up dotenv for secrets
+-   actually import dl library and do the work
+-   add unit testing
