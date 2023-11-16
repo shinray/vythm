@@ -17,7 +17,6 @@ const loadCommandModules = (
 
     files.forEach((file) => {
         const filePath = path.join(dirPath, file);
-        console.debug('filepath', filePath);
         if (fs.statSync(filePath).isDirectory()) {
             // TODO: test that this actually recurses properly
             fileArray = loadCommandModules(filePath, fileArray);
@@ -25,8 +24,6 @@ const loadCommandModules = (
             fileArray.push(filePath);
         }
     });
-
-    console.debug('fileArray', fileArray);
 
     return fileArray.filter(
         (file) => file.endsWith('.js') || file.endsWith('.ts'),

@@ -28,18 +28,18 @@ export default class DiscordClient extends Client {
         this.events
             .init()
             .then(() => {
-                console.debug('Initialized eventhandler');
+                console.debug('Initialized EventHandler');
             })
             .catch((error) => {
-                console.error('Error initializing eventhandler', error);
+                console.error('Error initializing EventHandler', error);
             });
         this.interactions
             .init()
             .then(() => {
-                console.debug('Initialized interactionhandler');
+                console.debug('Initialized UnteractionHandler');
             })
             .catch((error) => {
-                console.error('Error initializing interactionhandler', error);
+                console.error('Error initializing InteractionHandler', error);
             });
         this.login(config.token)
             .then(() => {

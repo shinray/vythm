@@ -21,7 +21,7 @@ export default class InteractionHandler extends Collection<
         const folder = 'interactions';
         const path = join(__dirname, '..', folder);
         const files = loadCommandModules(path);
-        console.debug('interaction modules', files);
+        console.debug('Discovered interaction modules', files);
 
         await Promise.all(
             files.map(async (file) => {
@@ -34,10 +34,10 @@ export default class InteractionHandler extends Collection<
                     InteractionClass.prototype instanceof Interaction
                 ) {
                     const command = new InteractionClass(this.client);
-                    console.debug('loading command', command.name);
+                    console.debug(`loading command module ${command.name}...`);
                     this.set(command.name, command);
                 } else {
-                    console.error(`Error loading command ${file}`);
+                    console.error(`Error loading command module ${file}`);
                 }
             }),
         );
@@ -51,7 +51,8 @@ export default class InteractionHandler extends Collection<
         const { clientId } = config;
 
         try {
-            console.log(`Publishing ${this.size} commands to Discord`);
+            console.log(`Publishing ${this.size} commands to Discord API...`);
+            this.map((i) => console.debug(`--Publishing ${i.name}`));
             await rest.put(Routes.applicationCommands(clientId), {
                 body,
             });

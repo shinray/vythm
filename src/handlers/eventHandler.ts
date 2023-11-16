@@ -29,7 +29,7 @@ export default class EventHandler extends Collection<string, DiscordEvent> {
                     EventClass.prototype instanceof DiscordEvent
                 ) {
                     const event = new EventClass(this.client);
-                    console.debug('loading event module', event.name);
+                    console.debug(`loading event module ${event.name}...`);
                     this.set(event.name, event);
                     // Choose between this.client.once() and this.client.on()
                     // Register a callback to happen based on event.name
