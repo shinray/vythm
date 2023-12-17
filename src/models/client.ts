@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import config from '../config.json';
 import InteractionHandler from '../handlers/interactionHandler';
 import EventHandler from '../handlers/eventHandler';
+import MusicHandler from '../handlers/musicHandler';
 
 export default class DiscordClient extends Client {
     public caches = {};
@@ -10,6 +11,9 @@ export default class DiscordClient extends Client {
     public events = new EventHandler(this);
 
     public interactions = new InteractionHandler(this);
+
+    // Active music clients (one per guild)
+    public musicPlayers = new MusicHandler(this);
 
     constructor() {
         super({

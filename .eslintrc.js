@@ -70,5 +70,7 @@ module.exports = {
         'import/prefer-default-export': 'off', // Allowing single exports for simplicity
         '@typescript-eslint/explicit-module-boundary-types': 'off', // Allowing implicit return types for simplicity
         quotes: ['error', 'single'],
+        'no-shadow': 'off', // https://stackoverflow.com/questions/63961803/eslint-says-all-enums-in-typescript-app-are-already-declared-in-the-upper-scope
+        camelcase: 'off',
     },
 };

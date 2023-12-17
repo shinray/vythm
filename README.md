@@ -6,6 +6,8 @@ A discord bot in Node.js
 
 -   Node 16
 -   Discord.js
+-   -   @discordjs/voice
+-   libsodium-wrappers
 
 ## Notes
 
