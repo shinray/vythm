@@ -35,8 +35,10 @@ import {
     joinVoiceChannel,
 } from '@discordjs/voice';
 import { VoiceChannel } from 'discord.js';
+import { YouTubeVideo } from 'play-dl';
 import DiscordClient from './client';
-import { LoopMode } from '../types/definitions';
+import { LoopMode, StreamQuality, Track } from '../types/definitions';
+import { createStream } from '../utils/audio';
 
 export default class MusicPlayer extends AudioPlayer {
     readonly client: DiscordClient;
@@ -47,12 +49,14 @@ export default class MusicPlayer extends AudioPlayer {
 
     voiceChannelId: string | undefined;
 
-    tracks: any[] = [];
+    tracks: YouTubeVideo[] = [];
 
     // Track position index
     trackAt: number = 0;
 
     loopMode: LoopMode = 'off';
+
+    quality: StreamQuality = StreamQuality.lowest;
 
     idleTimer = 60000;
 
@@ -89,7 +93,7 @@ export default class MusicPlayer extends AudioPlayer {
         this.voiceChannelId = undefined;
     };
 
-    add = async (track: any) => {
+    add = async (track: YouTubeVideo) => {
         this.tracks.push(track);
 
         // If we're not playing anything, start playing.
@@ -98,7 +102,7 @@ export default class MusicPlayer extends AudioPlayer {
             this.state.status === AudioPlayerStatus.Idle
         ) {
             this.trackAt = this.tracks.length;
-            // await this.play(track);
+            await this.play(track);
         }
 
         // Probably not strictly necessary to return tracklength.
@@ -109,7 +113,7 @@ export default class MusicPlayer extends AudioPlayer {
         if (trackNumber < 0) return;
 
         // Get currently playing, if applicable
-        let track: any;
+        let track: YouTubeVideo;
         if (this.trackAt !== 0) {
             track = this.tracks[this.trackAt - 1];
         }
@@ -123,10 +127,10 @@ export default class MusicPlayer extends AudioPlayer {
     };
 
     // Returns track data - useful for some cases where context is required
-    // play = async (track) => {
-    //     super.play();
-    //     return track;
-    // };
+    play = async (track: YouTubeVideo) => {
+        super.play(await createStream(track));
+        return track;
+    };
 
     stop = (force?: boolean | undefined): boolean => {
         this.stopCalled = true;
@@ -136,6 +140,12 @@ export default class MusicPlayer extends AudioPlayer {
     // Attempts to parse mode string
     setLoop = (mode: string) => {
         this.loopMode = (mode as LoopMode) || 'off';
+    };
+
+    setQuality = (quality: number) => {
+        // TODO: maybe do some rounding or something
+        if (!Number.isInteger(quality)) return;
+        this.quality = quality;
     };
 
     setTimeout = () => {
