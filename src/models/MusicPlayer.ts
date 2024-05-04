@@ -58,7 +58,7 @@ export default class MusicPlayer extends AudioPlayer {
 
     loopMode: LoopMode = LoopMode.OFF;
 
-    quality: StreamQuality = StreamQuality.lowest;
+    quality: StreamQuality = StreamQuality.LOWEST;
 
     idleTimer = 60000;
 
@@ -96,7 +96,7 @@ export default class MusicPlayer extends AudioPlayer {
         });
         this.connection.subscribe(this);
 
-        this.setTimeout();
+        this.setIdleTimeout();
     };
 
     /**
@@ -189,7 +189,7 @@ export default class MusicPlayer extends AudioPlayer {
     };
 
     // Attempts to parse mode string
-    setLoop = (mode: string) => {
+    setLoopMode = (mode: string) => {
         this.loopMode = (mode as LoopMode) || LoopMode.OFF;
     };
 
@@ -207,7 +207,7 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * Start countdown to disconnect from voice.
      */
-    setTimeout = () => {
+    setIdleTimeout = () => {
         if (!this.timeout) {
             this.stopCalled = false;
             this.timeout = setTimeout(() => {
@@ -241,7 +241,7 @@ export default class MusicPlayer extends AudioPlayer {
         console.log('noConnection', !this.connection);
         // bail early
         if (!this.connection || this.stopCalled) {
-            this.setTimeout();
+            this.setIdleTimeout();
             return;
         }
 
@@ -259,7 +259,7 @@ export default class MusicPlayer extends AudioPlayer {
             return;
         }
 
-        this.setTimeout();
+        this.setIdleTimeout();
     };
 
     /**

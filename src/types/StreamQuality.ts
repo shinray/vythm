@@ -1,5 +1,5 @@
 export enum StreamQuality {
-    lowest = 0,
-    medium = 1,
-    highest = 2,
+    LOWEST = 0,
+    MEDIUM = 1,
+    HIGHEST = 2,
 }

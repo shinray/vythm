@@ -21,7 +21,7 @@ import { StreamQuality } from '../types/StreamQuality';
  */
 export const createStream = async (
     metadata: play.YouTubeVideo | any,
-    options: StreamOptions = { quality: StreamQuality.lowest },
+    options: StreamOptions = { quality: StreamQuality.LOWEST },
 ): Promise<AudioResource<any>> => {
     console.debug('Create Stream!', metadata?.url);
     const streamOptions = options;
