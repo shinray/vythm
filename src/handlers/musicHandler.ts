@@ -6,6 +6,9 @@ import { Collection } from 'discord.js';
 import MusicPlayer from '../models/MusicPlayer';
 import DiscordClient from '../models/client';
 
+/**
+ * Handles different instances of MusicPlayer.
+ */
 export default class MusicHandler extends Collection<string, MusicPlayer> {
     readonly client: DiscordClient;
 

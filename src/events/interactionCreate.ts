@@ -1,6 +1,9 @@
 import { Events, Interaction } from 'discord.js';
 import DiscordEvent from '../models/Event';
 
+/**
+ * Script for handling InteractionCreate Event. AKA slash commands.
+ */
 export default class InteractionCreate extends DiscordEvent {
     name = Events.InteractionCreate;
 

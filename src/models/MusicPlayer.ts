@@ -74,9 +74,18 @@ export default class MusicPlayer extends AudioPlayer {
         this.guildId = guildId;
         this.on(AudioPlayerStatus.Playing, () => this.onPlay());
         this.on(AudioPlayerStatus.Idle, this.onIdleWrapper); // handle song advance
+        // Debug stuff, remove later.
+        this.on(AudioPlayerStatus.Paused, () => this.onPause());
+        this.on(AudioPlayerStatus.AutoPaused, () => this.onAutoPause());
+        this.on(AudioPlayerStatus.Buffering, () => this.onBuffering());
     }
 
-    connect = (voiceChannel: VoiceChannel) => {
+    /**
+     * Commands instance to join a voice channel. Has idle timeout.
+     * @param {VoiceChannel} voiceChannel Discord voice channel object
+     * @returns {void}
+     */
+    connect = (voiceChannel: VoiceChannel): void => {
         // Dedupe
         if (this.voiceChannelId === voiceChannel.id) return;
         this.voiceChannelId = voiceChannel.id;
@@ -90,6 +99,9 @@ export default class MusicPlayer extends AudioPlayer {
         this.setTimeout();
     };
 
+    /**
+     * Destroy connection, cleanup.
+     */
     disconnect = (): void => {
         this.connection?.destroy();
         this.connection = undefined;
@@ -155,7 +167,13 @@ export default class MusicPlayer extends AudioPlayer {
         return track;
     }
 
+    /**
+     * Stops playback. Destroys current resource. Also indirectly starts idle timer again.
+     * @param {boolean} force Force into idle state, override padding
+     * @returns {boolean} True if the player comes to a stop, otherwise false
+     */
     stop = (force?: boolean | undefined): boolean => {
+        // TODO: this stops playback, but theoretically, there should be a resume?
         this.stopCalled = true;
         return super.stop(force);
     };

@@ -10,14 +10,12 @@ export const search = async (
     const validationResult: PlayValidation = await play.validate(query);
 
     if (validationResult === 'search') {
-        const searchResult = await play.search(query, {
+        const [searchResult] = await play.search(query, {
             source: { youtube: 'video' },
             limit: 1,
         });
 
-        if (searchResult.length === 0) return null;
-
-        return searchResult[0];
+        return searchResult ?? null;
     }
 
     if (validationResult === 'yt_video') {
