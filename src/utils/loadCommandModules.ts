@@ -12,7 +12,7 @@ const loadCommandModules = (
     accumulator?: string[],
 ): string[] => {
     const files = fs.readdirSync(dirPath);
-    console.debug('files', files);
+    console.debug(`files in path ${dirPath}:`, files);
     let fileArray = accumulator ? [...accumulator] : [];
 
     files.forEach((file) => {

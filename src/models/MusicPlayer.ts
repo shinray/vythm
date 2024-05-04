@@ -3,6 +3,7 @@
 /* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
 /* eslint @typescript-eslint/no-explicit-any: "warn" */
 /* eslint @typescript-eslint/require-await: "warn" */
+/* eslint class-methods-use-this: "warn" */
 // TODO: replace 'any'
 /**
  * What does MusicPlayer need to do?
@@ -37,7 +38,8 @@ import {
 import { VoiceChannel } from 'discord.js';
 import { YouTubeVideo } from 'play-dl';
 import DiscordClient from './client';
-import { LoopMode, StreamQuality, Track } from '../types/definitions';
+import { LoopMode } from '../types/definitions';
+import { StreamQuality } from '../types/StreamQuality';
 import { createStream } from '../utils/audio';
 
 export default class MusicPlayer extends AudioPlayer {
@@ -70,6 +72,8 @@ export default class MusicPlayer extends AudioPlayer {
         super({ behaviors: { noSubscriber: NoSubscriberBehavior.Play } });
         this.client = client;
         this.guildId = guildId;
+        this.on(AudioPlayerStatus.Playing, () => this.onPlay());
+        this.on(AudioPlayerStatus.Idle, () => this.onIdle()); // handle song advance
     }
 
     connect = (voiceChannel: VoiceChannel) => {
@@ -96,12 +100,14 @@ export default class MusicPlayer extends AudioPlayer {
     add = async (track: YouTubeVideo) => {
         this.tracks.push(track);
 
+        console.debug('Player.Add! Current tracklist size', this.tracks.length);
         // If we're not playing anything, start playing.
         if (
             this.tracks.length === 1 ||
             this.state.status === AudioPlayerStatus.Idle
         ) {
             this.trackAt = this.tracks.length;
+            console.debug(`playing track ${track.title}`);
             await this.play(track);
         }
 
@@ -113,28 +119,56 @@ export default class MusicPlayer extends AudioPlayer {
         if (trackNumber < 0) return;
 
         // Get currently playing, if applicable
-        let track: YouTubeVideo;
+        let track: YouTubeVideo | undefined;
         if (this.trackAt !== 0) {
             track = this.tracks[this.trackAt - 1];
         }
-
         this.tracks.splice(trackNumber - 1, 1);
 
         // Update current track position, if applicable
         if (track) {
-            this.trackAt = this.tracks.findIndex((t) => t.id === track.id) + 1;
+            this.trackAt = this.tracks.findIndex((t) => t.id === track?.id) + 1;
         }
     };
 
     // Returns track data - useful for some cases where context is required
-    play = async (track: YouTubeVideo) => {
-        super.play(await createStream(track));
-        return track;
-    };
+    // play = async (track: YouTubeVideo) => {
+    // play = async (track: any) => {
+    //     const audioResource = await createStream(track);
+    //     console.debug('AudioResource', audioResource);
+    //     try {
+    //         super.play(audioResource);
+    //     } catch (e) {
+    //         console.error('Error playing track', e);
+    //     }
+    //     // const audioPlayerPlay = Object.getPrototypeOf(
+    //     //     Object.getPrototypeOf(this),
+    //     // ).play;
+    //     // console.debug('Track!', track);
+    //     // audioPlayerPlay.call(this, await createStream(track));
+    //     // super.play.call(this, await createStream(track));
+    //     return track;
+    // };
+
+    // Typescript transpiles funny if I use an arrow fn here...something about
+    // calling super in an arrow fn is no gucci
+    async play(track: any) {
+        const audioResource = await createStream(track);
+        console.debug('AudioResource', audioResource);
+        try {
+            super.play(audioResource);
+        } catch (e) {
+            console.error('Error playing track', e);
+        }
+    }
 
     stop = (force?: boolean | undefined): boolean => {
         this.stopCalled = true;
         return super.stop(force);
+    };
+
+    next = () => {
+        throw new Error('Not implemented!');
     };
 
     // Attempts to parse mode string
@@ -151,7 +185,10 @@ export default class MusicPlayer extends AudioPlayer {
     setTimeout = () => {
         if (!this.timeout) {
             this.stopCalled = false;
-            this.timeout = setTimeout(() => this.disconnect(), this.idleTimer);
+            this.timeout = setTimeout(() => {
+                console.debug('Idle disconnect, goodbye!');
+                this.disconnect();
+            }, this.idleTimer);
         }
     };
 
@@ -160,5 +197,33 @@ export default class MusicPlayer extends AudioPlayer {
             clearTimeout(this.timeout);
             this.timeout = undefined;
         }
+    };
+
+    onPlay = (): void => {
+        console.debug('Playing!');
+        this.clearTimeout();
+    };
+
+    onIdle = (): void => {
+        // TODO: advance to next audio in queue
+        console.log('noConnection', !this.connection);
+        // eslint-disable-next-line no-useless-return
+        if (!this.connection) return;
+        // throw new Error('Method not implemented.');
+    };
+
+    // eslint-disable-next-line class-methods-use-this
+    onBuffering = (): void => {
+        console.debug('Buffering!');
+    };
+
+    // eslint-disable-next-line class-methods-use-this
+    onAutoPause = (): void => {
+        console.debug('AutoPause!');
+    };
+
+    // eslint-disable-next-line class-methods-use-this
+    onPause = (): void => {
+        console.debug('Paused!');
     };
 }

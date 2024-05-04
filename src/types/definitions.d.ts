@@ -1,6 +1,7 @@
 import * as play from 'play-dl';
 import DiscordEvent from '../models/Event';
 import DiscordClient from '../models/client';
+import { StreamQuality } from './StreamQuality';
 // Placeholder file for typescript definitions
 export type EventConstructor<T extends DiscordEvent> = new (
     client: DiscordClient,
@@ -11,12 +12,6 @@ export type InteractionConstructor<T extends Interaction> = new (
 ) => T;
 
 export type LoopMode = 'off' | 'current' | 'all';
-
-export enum StreamQuality {
-    lowest = 0,
-    medium = 1,
-    highest = 2,
-}
 
 export interface StreamOptions {
     seek?: number;

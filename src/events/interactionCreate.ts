@@ -1,8 +1,8 @@
-import { Interaction } from 'discord.js';
+import { Events, Interaction } from 'discord.js';
 import DiscordEvent from '../models/Event';
 
 export default class InteractionCreate extends DiscordEvent {
-    name = 'interactionCreate';
+    name = Events.InteractionCreate;
 
     execute = async (...args: unknown[]) => {
         const interaction = args[0] as Interaction;

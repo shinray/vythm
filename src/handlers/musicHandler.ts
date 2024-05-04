@@ -19,6 +19,7 @@ export default class MusicHandler extends Collection<string, MusicPlayer> {
 
     create = (guildId: string): MusicPlayer => {
         const player = new MusicPlayer(this.client, guildId);
+        console.debug('Created new MusicPlayer!', player);
         this.set(guildId, player);
         return player;
     };

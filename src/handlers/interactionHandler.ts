@@ -48,14 +48,18 @@ export default class InteractionHandler extends Collection<
         // registerCommands(this);
         const body = this.map((c) => c.toJSON());
         const rest = new REST().setToken(config.token);
-        const { clientId } = config;
+        const { clientId, guildId } = config;
 
         try {
             console.log(`Publishing ${this.size} commands to Discord API...`);
             this.map((i) => console.debug(`--Publishing ${i.name}`));
-            await rest.put(Routes.applicationCommands(clientId), {
-                body,
-            });
+            const response = await rest.put(
+                Routes.applicationGuildCommands(clientId, guildId),
+                {
+                    body,
+                },
+            );
+            console.debug('response', response);
         } catch (e) {
             console.error('Error registering commands to API ', e);
         }

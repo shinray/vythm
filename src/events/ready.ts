@@ -1,9 +1,9 @@
-import { ActivityType } from 'discord.js';
+import { ActivityType, Events } from 'discord.js';
 import DiscordClient from '../models/client';
 import DiscordEvent from '../models/Event';
 
 export default class Ready extends DiscordEvent {
-    name = 'ready';
+    name = Events.ClientReady;
 
     once = true;
 
@@ -16,7 +16,7 @@ export default class Ready extends DiscordEvent {
             status: 'online',
             activities: [
                 {
-                    name: '/help',
+                    name: '/play',
                     type: ActivityType.Listening,
                 },
             ],

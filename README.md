@@ -8,6 +8,7 @@ A discord bot in Node.js
 -   Discord.js
 -   -   @discordjs/voice
 -   libsodium-wrappers
+-   ffmpeg-static
 
 ## Notes
 
@@ -30,5 +31,5 @@ are emitted by Client and need to be handled with an event handler
 
 -   clean up comments
 -   set up dotenv for secrets
--   actually import dl library and do the work
 -   add unit testing
+-   dockerize!

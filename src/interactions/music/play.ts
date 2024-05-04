@@ -1,31 +1,46 @@
-import { CommandInteraction } from 'discord.js';
+import {
+    CommandInteraction,
+    GuildMember,
+    SlashCommandStringOption,
+    VoiceChannel,
+} from 'discord.js';
 import Interaction from '../../models/Interaction';
+import { search } from '../../services/search';
 
-// TODO: placeholder
 export default class Play extends Interaction<CommandInteraction> {
     name = 'play';
 
-    description = 'play with me (PLACEHOLDER)';
+    description = 'play with me';
+
+    options = [
+        new SlashCommandStringOption()
+            .setName('query')
+            .setDescription('Enter keyword or youtube url.')
+            .setRequired(true),
+    ];
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        console.debug('play command received');
-        const userId = `<@${interaction.user.id}>`;
-        const d20: number = Math.floor(Math.random() * 20) + 1;
-        let response = `${userId} rolled a d20 and got: ${d20}`;
-        switch (d20) {
-            case 20:
-                response += '! NAT TWENTY!';
-                break;
-            case 1:
-                response += '! CRITICAL FAILURE :<';
-                response += '\n<@everyone> point and laugh!';
-                break;
-            default:
-                response += '.';
-                break;
-        }
-        console.debug(response);
-        await interaction.editReply(response);
+        const player = this.client.musicPlayers.getOrCreate(
+            interaction.guildId!,
+        );
+        const member = interaction.member as GuildMember;
+        const query = interaction.options.get(this.options[0].name, true)
+            .value as string;
+        const metadata = await search(query);
+        if (!metadata) {
+            await interaction.editReply(`no results for query ${query}`);
+        } else console.debug('metadata ok!');
+
+        // const memberChannel = interaction.channel as TextChannel;
+        const voiceChannel = member.voice.channel as VoiceChannel;
+        player.connect(voiceChannel);
+
+        let trackAt;
+        if (metadata) trackAt = await player.add(metadata);
+
+        await interaction.editReply(
+            `now playing ${trackAt}: ${metadata?.title}`,
+        );
     };
 }

@@ -17,7 +17,7 @@ export default class EventHandler extends Collection<string, DiscordEvent> {
         const folder = 'events';
         const path = join(__dirname, '..', folder);
         const files = loadCommandModules(path);
-        console.debug('event modules', files);
+        console.debug('Discovered event modules', files);
         await Promise.all(
             files.map(async (file) => {
                 const module = (await import(file)) as {

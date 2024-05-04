@@ -19,9 +19,9 @@ export default class DiscordClient extends Client {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
-                // GatewayIntentBits.GuildMessages,
-                // GatewayIntentBits.GuildPresences,
-                // GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.GuildVoiceStates,
             ],
         });
 
@@ -40,7 +40,7 @@ export default class DiscordClient extends Client {
         this.interactions
             .init()
             .then(() => {
-                console.debug('Initialized UnteractionHandler');
+                console.debug('Initialized InteractionHandler');
             })
             .catch((error) => {
                 console.error('Error initializing InteractionHandler', error);
