@@ -232,10 +232,8 @@ export default class MusicPlayer extends AudioPlayer {
      * Cancel idle disconnect countdown
      */
     clearTimeout = () => {
-        if (this.timeout) {
-            clearTimeout(this.timeout);
-            this.timeout = undefined;
-        }
+        clearTimeout(this.timeout);
+        this.timeout = undefined;
     };
 
     // === State change effects! ===

@@ -5,7 +5,6 @@
 /* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
 // TODO: fix typescript explicit any. Right now, we're only expecting youtube urls...
 // in fact, try and genericize this such that it accepts all the types play-dl supports...
-// TODO: createAudioResource - play stream and wrap in createAudioResource
 // takes URL and quality
 
 import * as play from 'play-dl';

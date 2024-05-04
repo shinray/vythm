@@ -24,6 +24,16 @@ export default class Play extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
+
+        // const memberChannel = interaction.channel as TextChannel;
+        const voiceChannel = member.voice.channel as VoiceChannel;
+        if (!voiceChannel) {
+            await interaction.editReply(
+                "I'm too shy, I can't join on my own! You must be in a voice channel!",
+            );
+            return;
+        }
+
         const query = interaction.options.get(this.options[0].name, true)
             .value as string;
         const metadata = await search(query);
@@ -32,8 +42,6 @@ export default class Play extends Interaction<CommandInteraction> {
             return;
         }
 
-        // const memberChannel = interaction.channel as TextChannel;
-        const voiceChannel = member.voice.channel as VoiceChannel;
         player.connect(voiceChannel);
 
         const trackAt = await player.add(metadata);
