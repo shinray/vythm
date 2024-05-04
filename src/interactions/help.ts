@@ -8,7 +8,6 @@ export default class Help extends Interaction<CommandInteraction> {
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        console.debug('help command received');
         await interaction.editReply('Coming soon!');
     };
 }

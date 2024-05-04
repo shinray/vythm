@@ -7,7 +7,6 @@ export default class Ping extends Interaction<CommandInteraction> {
     description = 'Replies with Pong!';
 
     execute = async (interaction: CommandInteraction): Promise<void> => {
-        console.debug('ping command received');
         const execTime = Math.abs(Date.now() - interaction.createdTimestamp);
         const apiLatency = Math.floor(this.client.ws.ping);
         console.debug('execTime', execTime, 'apiLatency', apiLatency);

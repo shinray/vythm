@@ -5,5 +5,8 @@ const client = new DiscordClient();
 
 client.on(Events.InteractionCreate, (interaction) => {
     if ('commandName' in interaction)
-        console.debug('commandName', interaction.commandName);
+        console.debug(
+            `${interaction.user.username}:commandName`,
+            interaction.commandName,
+        );
 });

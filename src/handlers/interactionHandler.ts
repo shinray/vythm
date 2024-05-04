@@ -3,8 +3,8 @@ import { join } from 'path';
 import DiscordClient from '../models/client';
 import Interaction from '../models/Interaction';
 import loadCommandModules from '../utils/loadCommandModules';
-import config from '../config.json';
-import { InteractionConstructor } from '../types/definitions';
+import configJson from '../config.json';
+import { InteractionConstructor, VythmConfig } from '../types/definitions';
 
 export default class InteractionHandler extends Collection<
     string,
@@ -44,12 +44,12 @@ export default class InteractionHandler extends Collection<
     };
 
     deploy = async () => {
+        const config: VythmConfig = configJson;
+        const { token, clientId, guildId } = config;
         // TODO: make api call to register all commands
         // registerCommands(this);
         const body = this.map((c) => c.toJSON());
-        const rest = new REST().setToken(config.token);
-        const { clientId, guildId } = config;
-
+        const rest = new REST().setToken(token);
         try {
             console.log(`Publishing ${this.size} commands to Discord API...`);
             this.map((i) => console.debug(`--Publishing ${i.name}`));

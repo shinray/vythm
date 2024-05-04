@@ -11,8 +11,6 @@ export type InteractionConstructor<T extends Interaction> = new (
     client: DiscordClient,
 ) => T;
 
-export type LoopMode = 'off' | 'current' | 'all';
-
 export interface StreamOptions {
     seek?: number;
     quality?: StreamQuality;
@@ -39,4 +37,10 @@ export type PlayValidation =
 // This is probably a terrible idea and I will definitely regret this in the future
 export interface Track extends play.YouTubeVideo {
     trackType: string;
+}
+
+export interface VythmConfig {
+    token: string;
+    clientId: string;
+    guildId: string;
 }

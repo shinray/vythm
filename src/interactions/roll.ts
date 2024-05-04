@@ -8,7 +8,6 @@ export default class Roll extends Interaction<CommandInteraction> {
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        console.debug('play command received');
         const userId = `<@${interaction.user.id}>`;
         const d20: number = Math.floor(Math.random() * 20) + 1;
         let response = `${userId} rolled a d20 and got: ${d20}`;

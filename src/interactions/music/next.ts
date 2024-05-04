@@ -11,7 +11,7 @@ export default class Stop extends Interaction<CommandInteraction> {
         const player = this.client.musicPlayers.getOrCreate(
             interaction.guildId!,
         );
-        const metadata = player.next();
+        const metadata = await player.next();
 
         if (metadata) {
             await interaction.editReply(
