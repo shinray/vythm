@@ -61,7 +61,7 @@ export default class MusicPlayer extends AudioPlayer {
 
     quality: StreamQuality = StreamQuality.LOWEST;
 
-    idleTimer = 60000;
+    idleTimer = 60000; // consider extracting to a constant or config file
 
     private connection: VoiceConnection | undefined;
 
@@ -159,7 +159,7 @@ export default class MusicPlayer extends AudioPlayer {
     // calling super in an arrow fn is no gucci
     async playTrack(track: YouTubeVideo) {
         try {
-            const audioResource = await createStream(track);
+            const audioResource = await createStream(track); // TODO: use this.quality
             console.debug('AudioResource', audioResource);
             super.play(audioResource);
         } catch (e) {
@@ -240,7 +240,7 @@ export default class MusicPlayer extends AudioPlayer {
 
     // === State change effects! ===
 
-    onPlay = (): void => {
+    private onPlay = (): void => {
         console.debug('Playing!');
         this.clearTimeout();
     };
@@ -248,7 +248,7 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * Handles next track behavior
      */
-    onIdle = async (): Promise<void> => {
+    private onIdle = async (): Promise<void> => {
         console.log('noConnection', !this.connection);
         // bail early
         if (!this.connection || this.stopCalled) {
@@ -276,7 +276,7 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * some stupid bs to make linter shut up about async fns
      */
-    onIdleWrapper = () => {
+    private onIdleWrapper = () => {
         this.onIdle()
             .then(() => {})
             .catch(() => {});
@@ -285,17 +285,17 @@ export default class MusicPlayer extends AudioPlayer {
     // These are probably useless. Can remove later, but need these for debugging atm
 
     // eslint-disable-next-line class-methods-use-this
-    onBuffering = (): void => {
+    private onBuffering = (): void => {
         console.debug('Buffering!');
     };
 
     // eslint-disable-next-line class-methods-use-this
-    onAutoPause = (): void => {
+    private onAutoPause = (): void => {
         console.debug('AutoPause!');
     };
 
     // eslint-disable-next-line class-methods-use-this
-    onPause = (): void => {
+    private onPause = (): void => {
         console.debug('Paused!');
     };
 }

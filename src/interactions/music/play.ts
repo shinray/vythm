@@ -29,17 +29,20 @@ export default class Play extends Interaction<CommandInteraction> {
         const metadata = await search(query);
         if (!metadata) {
             await interaction.editReply(`no results for query ${query}`);
-        } else console.debug('metadata ok!');
+            return;
+        }
 
         // const memberChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         player.connect(voiceChannel);
 
-        let trackAt;
-        if (metadata) trackAt = await player.add(metadata);
+        const trackAt = await player.add(metadata);
 
         await interaction.editReply(
-            `now playing ${trackAt}: ${metadata?.title}`,
+            `now playing #${trackAt}: ` +
+                `[${metadata?.title}](${metadata?.url}) ` +
+                `(${metadata?.durationRaw}), ` +
+                `requested by ${member.displayName}`,
         );
     };
 }
