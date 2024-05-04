@@ -1,21 +1,21 @@
 import { CommandInteraction } from 'discord.js';
 import Interaction from '../../models/Interaction';
 
-export default class Next extends Interaction<CommandInteraction> {
-    name = 'next';
+export default class Prev extends Interaction<CommandInteraction> {
+    name = 'prev';
 
-    description = "It's for a church, honey!";
+    description = 'Spin 360 degrees and moonwalk away';
 
     execute = async (interaction: CommandInteraction) => {
         const player = this.client.musicPlayers.getOrCreate(
             interaction.guildId!,
         );
-        const metadata = await player.next();
+        const metadata = await player.prev();
 
         if (metadata) {
             await interaction.editReply(
-                // `next: ${metadata?.title}`
-                "Don't need the attitude! Next!",
+                // `prev: ${metadata?.title}`,
+                'I never look back, dahling, it distracts from the now.',
             );
         } else {
             await interaction.editReply("that's all, folks!");

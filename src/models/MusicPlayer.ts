@@ -4,7 +4,8 @@
 /* eslint @typescript-eslint/no-explicit-any: "warn" */
 /* eslint @typescript-eslint/require-await: "warn" */
 /* eslint class-methods-use-this: "warn" */
-// TODO: replace 'any'
+// TODO: replace all instances of 'any' i.e. track/track metadata.
+// Need to find some kind of type that unifies yt, spotify, soundcloud, deezer...
 /**
  * What does MusicPlayer need to do?
  * * Unique to guild
@@ -180,11 +181,21 @@ export default class MusicPlayer extends AudioPlayer {
 
     // TODO: really need to create a type for Track...and fix it everywhere that touches .play()
     next = async (): Promise<YouTubeVideo | null> => {
-        // throw new Error('Not implemented!');
         if (this.trackAt < this.tracks.length) this.trackAt += 1;
         else if (this.loopMode === LoopMode.ALL) this.trackAt = 1;
         else if (this.loopMode === LoopMode.OFF) return null;
 
+        return this.playTrack(this.tracks[this.trackAt - 1]);
+    };
+
+    /**
+     * Play previous track.
+     * @returns Metadata for currently playing track
+     */
+    prev = async (): Promise<YouTubeVideo | null> => {
+        if (this.trackAt <= 1) return null;
+
+        this.trackAt -= 1;
         return this.playTrack(this.tracks[this.trackAt - 1]);
     };
 

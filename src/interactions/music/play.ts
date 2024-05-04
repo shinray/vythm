@@ -19,7 +19,6 @@ export default class Play extends Interaction<CommandInteraction> {
             .setRequired(true),
     ];
 
-    // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
         const player = this.client.musicPlayers.getOrCreate(
             interaction.guildId!,

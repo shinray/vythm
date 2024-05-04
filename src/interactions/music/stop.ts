@@ -6,7 +6,6 @@ export default class Stop extends Interaction<CommandInteraction> {
 
     description = 'Stop the music!';
 
-    // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
         const player = this.client.musicPlayers.getOrCreate(
             interaction.guildId!,
