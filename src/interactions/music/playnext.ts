@@ -4,15 +4,14 @@ import {
     SlashCommandStringOption,
     VoiceChannel,
 } from 'discord.js';
+import { AudioPlayerStatus } from '@discordjs/voice';
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
 
-// TODO: add behavior for pause/unpause/resume
+export default class PlayNext extends Interaction<CommandInteraction> {
+    name = 'playnext';
 
-export default class Play extends Interaction<CommandInteraction> {
-    name = 'play';
-
-    description = 'play with me';
+    description = 'play something next in queue';
 
     options = [
         new SlashCommandStringOption()
@@ -26,7 +25,6 @@ export default class Play extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
-        // const memberChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -45,13 +43,20 @@ export default class Play extends Interaction<CommandInteraction> {
 
         player.connect(voiceChannel);
 
-        const trackAt = await player.add(metadata);
+        const nextTrackAt = player.insertNext(metadata);
+        if (player.state.status === AudioPlayerStatus.Idle) {
+            const track = await player.skip(nextTrackAt);
+            await interaction.editReply(
+                `now playing #${nextTrackAt}: ` +
+                    `[${track?.title}](${track?.url}) ` +
+                    `(${track?.durationRaw}), ` +
+                    `requested by ${member.displayName}`,
+            );
+            return;
+        }
 
         await interaction.editReply(
-            `now playing #${trackAt}: ` +
-                `[${metadata?.title}](${metadata?.url}) ` +
-                `(${metadata?.durationRaw}), ` +
-                `requested by ${member.displayName}`,
+            `inserted ${metadata.title} at position ${nextTrackAt}, `,
         );
     };
 }

@@ -1,6 +1,8 @@
 import { CommandInteraction } from 'discord.js';
 import Interaction from '../models/Interaction';
 
+// Future expansion: maybe a cute gif or some animation or something would be nice.
+
 export default class Roll extends Interaction<CommandInteraction> {
     name = 'roll';
 

@@ -7,12 +7,10 @@ import {
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
 
-// TODO: add behavior for pause/unpause/resume
+export default class PlayNow extends Interaction<CommandInteraction> {
+    name = 'playnow';
 
-export default class Play extends Interaction<CommandInteraction> {
-    name = 'play';
-
-    description = 'play with me';
+    description = 'skip current song and play now';
 
     options = [
         new SlashCommandStringOption()
@@ -25,8 +23,8 @@ export default class Play extends Interaction<CommandInteraction> {
         const player = this.client.musicPlayers.getOrCreate(
             interaction.guildId!,
         );
+
         const member = interaction.member as GuildMember;
-        // const memberChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -45,13 +43,15 @@ export default class Play extends Interaction<CommandInteraction> {
 
         player.connect(voiceChannel);
 
-        const trackAt = await player.add(metadata);
+        const nextTrackAt = player.insertNext(metadata);
+        const track = await player.skip(nextTrackAt, true); // force skip current song
+        const response =
+            'skipping track!\n' +
+            `now playing #${nextTrackAt}: ` +
+            `[${track?.title}](${track?.url}) ` +
+            `(${track?.durationRaw}), ` +
+            `requested by ${member.displayName}`;
 
-        await interaction.editReply(
-            `now playing #${trackAt}: ` +
-                `[${metadata?.title}](${metadata?.url}) ` +
-                `(${metadata?.durationRaw}), ` +
-                `requested by ${member.displayName}`,
-        );
+        await interaction.editReply(response);
     };
 }

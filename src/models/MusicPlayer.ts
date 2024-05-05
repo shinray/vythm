@@ -31,6 +31,7 @@
  */
 import {
     AudioPlayer,
+    AudioPlayerState,
     AudioPlayerStatus,
     NoSubscriberBehavior,
     VoiceConnection,
@@ -48,22 +49,26 @@ export default class MusicPlayer extends AudioPlayer {
 
     readonly guildId: string;
 
-    channelId: string | undefined;
+    private channelId: string | undefined; // text channel
 
-    voiceChannelId: string | undefined;
-
-    tracks: YouTubeVideo[] = [];
-
-    // Track position index
-    trackAt: number = 0;
-
-    loopMode: LoopMode = LoopMode.OFF;
-
-    quality: StreamQuality = StreamQuality.LOWEST;
-
-    idleTimer = 60000; // consider extracting to a constant or config file
+    private voiceChannelId: string | undefined;
 
     private connection: VoiceConnection | undefined;
+
+    private tracks: YouTubeVideo[] = [];
+
+    // Track position index. One-based index, vs tracks[] zero-based
+    private _trackAt: number = 0;
+
+    get trackAt(): number {
+        return this._trackAt;
+    }
+
+    private loopMode: LoopMode = LoopMode.OFF;
+
+    private quality: StreamQuality = StreamQuality.LOWEST;
+
+    readonly idleTimer = 60000; // consider extracting to a constant or config file
 
     private stopCalled = false;
 
@@ -75,7 +80,7 @@ export default class MusicPlayer extends AudioPlayer {
         this.guildId = guildId;
         this.on(AudioPlayerStatus.Playing, () => this.onPlay());
         this.on(AudioPlayerStatus.Idle, this.onIdleWrapper); // handle song advance
-        // Debug stuff, remove later.
+        // Debug stuff, TODO: remove later.
         this.on(AudioPlayerStatus.Paused, () => this.onPause());
         this.on(AudioPlayerStatus.AutoPaused, () => this.onAutoPause());
         this.on(AudioPlayerStatus.Buffering, () => this.onBuffering());
@@ -95,7 +100,10 @@ export default class MusicPlayer extends AudioPlayer {
             channelId: this.voiceChannelId,
             adapterCreator: voiceChannel.guild.voiceAdapterCreator,
         });
-        this.connection.subscribe(this);
+        this.connection.subscribe(this); // Can technically subscribe to multiple
+        // connections at once, but that doesn't make sense in this context.
+        // All connections would share the same audio. Would make more sense to have
+        // multiple Players active instead.
 
         this.setIdleTimeout();
     };
@@ -110,9 +118,9 @@ export default class MusicPlayer extends AudioPlayer {
     };
 
     /**
-     * Adds a track to the play queue
+     * Adds a track to the end of the play queue, and starts playback if idle
      * @param track Audio to be queued
-     * @returns {number} length of queue
+     * @returns {number} length of queue (queue position)
      */
     add = async (track: YouTubeVideo): Promise<number> => {
         this.tracks.push(track);
@@ -120,41 +128,80 @@ export default class MusicPlayer extends AudioPlayer {
         console.debug('Player.Add! Current tracklist size', this.tracks.length);
 
         const isNotPlaying =
-            this.tracks.length === 1 ||
+            this.tracks.length === 1 || // queue was empty and we just pushed
             this.state.status === AudioPlayerStatus.Idle;
         if (isNotPlaying) {
-            this.trackAt = this.tracks.length;
+            this._trackAt = this.tracks.length;
             console.debug(`playing track ${track.title}`);
             await this.playTrack(track);
         }
 
-        // Probably not strictly necessary to return tracklength.
+        // returns queue position
         return this.tracks.length;
+    };
+
+    /**
+     * Inserts a track into the play queue at a specified position. Does not affect playback.
+     * @param track Audio to insert
+     * @param {number} trackNumber index to insert into
+     */
+    insert = (track: YouTubeVideo, trackNumber: number) => {
+        // handle negative floor
+        if (trackNumber < 0) {
+            this.tracks.unshift(track);
+            if (this._trackAt !== 0) this._trackAt += 1; // adjust positions
+        }
+        // handle positive ceiling.
+        else if (trackNumber >= this.tracks.length) this.tracks.push(track);
+        // Honestly, the above two cases are pretty unlikely. We shouldn't be too smart
+        // about it and just let it happen.
+        else {
+            this.tracks.splice(trackNumber, 0, track);
+            if (this._trackAt >= trackNumber) this._trackAt += 1; // adjust positions
+        }
+    };
+
+    /**
+     * Inserts track to play immediately after the current one.
+     * When calling this, consider adding logic to immediately play if idle.
+     * @param track track to insert immediately
+     * @returns {number} next track position
+     */
+    insertNext = (track: YouTubeVideo): number => {
+        // index is zero based, but conveniently, we want the next track anyway
+        // so trackAt += 1; trackAt -=1, balances out
+        this.insert(track, this._trackAt);
+        return this._trackAt + 1;
     };
 
     /**
      * Remove from tracklist by index
      * @param {number} trackNumber index to remove from
-     * @returns {void}
+     * @returns {YouTubeVideo | null} track that was removed
      */
-    remove = (trackNumber: number): void => {
-        if (trackNumber < 0) return;
+    remove = (trackNumber: number): YouTubeVideo | null => {
+        const isInvalid =
+            trackNumber < 0 || trackNumber - 1 > this.tracks.length;
+        if (isInvalid) return null;
 
         // Get currently playing, if applicable
         let track: YouTubeVideo | undefined;
-        if (this.trackAt !== 0) {
-            track = this.tracks[this.trackAt - 1];
+        if (this._trackAt !== 0) {
+            track = this.tracks[this._trackAt - 1];
         }
-        this.tracks.splice(trackNumber - 1, 1);
+
+        const removedTrack = this.tracks.splice(trackNumber - 1, 1);
 
         // Update current track position, if applicable
         if (track) {
-            this.trackAt = this.tracks.findIndex((t) => t.id === track?.id) + 1;
+            this._trackAt =
+                this.tracks.findIndex((t) => t.id === track?.id) + 1;
         }
+
+        return removedTrack.length > 0 ? removedTrack[0] : null;
     };
 
     // Returns track data - useful for some cases where context is required
-
     // Typescript transpiles funny if I use an arrow fn here...something about
     // calling super in an arrow fn is no gucci
     async playTrack(track: YouTubeVideo) {
@@ -169,6 +216,32 @@ export default class MusicPlayer extends AudioPlayer {
     }
 
     /**
+     * Toggles pause status of the audio player instance
+     * @returns {boolean} `true` if successfully paused/unpaused, otherwise `false`
+     */
+    pauseTrack = (): boolean => {
+        const playerState: AudioPlayerState = this.state;
+        console.debug(`Current player status: ${playerState.status}`);
+        switch (playerState.status) {
+            case AudioPlayerStatus.Playing:
+                return super.pause();
+            case AudioPlayerStatus.Paused: // ignore AutoPaused
+                return super.unpause();
+            default:
+                return false;
+        }
+    };
+
+    /**
+     * Seeks within current track.
+     */
+    // eslint-disable-next-line class-methods-use-this
+    seek = () => {
+        // Did discordjs remove this functionality??
+        throw new Error('Not implemented!');
+    };
+
+    /**
      * Stops playback. Destroys current resource. Also indirectly starts idle timer again.
      * @param {boolean} force Force into idle state, override padding
      * @returns {boolean} True if the player comes to a stop, otherwise false
@@ -180,12 +253,18 @@ export default class MusicPlayer extends AudioPlayer {
     };
 
     // TODO: really need to create a type for Track...and fix it everywhere that touches .play()
+    /**
+     * Advances track counter and plays immediately.
+     * @returns {Promise<YouTubeVideo | null>} track metadata now playing, if applicable
+     */
     next = async (): Promise<YouTubeVideo | null> => {
-        if (this.trackAt < this.tracks.length) this.trackAt += 1;
-        else if (this.loopMode === LoopMode.ALL) this.trackAt = 1;
-        else if (this.loopMode === LoopMode.OFF) return null;
+        // Advance track counter, or handle looping.
+        if (this._trackAt < this.tracks.length) this._trackAt += 1;
+        else if (this.loopMode === LoopMode.ALL) this._trackAt = 1;
+        else if (this.loopMode === LoopMode.OFF) return null; // end of queue
+        // TODO: should we replay final track, or stop, or do nothing?
 
-        return this.playTrack(this.tracks[this.trackAt - 1]);
+        return this.playTrack(this.tracks[this._trackAt - 1]);
     };
 
     /**
@@ -193,10 +272,34 @@ export default class MusicPlayer extends AudioPlayer {
      * @returns Metadata for currently playing track
      */
     prev = async (): Promise<YouTubeVideo | null> => {
-        if (this.trackAt <= 1) return null;
+        if (this._trackAt <= 1) return null;
 
-        this.trackAt -= 1;
-        return this.playTrack(this.tracks[this.trackAt - 1]);
+        this._trackAt -= 1;
+        return this.playTrack(this.tracks[this._trackAt - 1]);
+    };
+
+    /**
+     * Jump to a track and start playing immediately
+     * @param {number} trackNumber position to jump to
+     * @param {boolean} [force=false] force skip the current track
+     * @returns {Promise<YouTubeVideo | null>} track metadata of nowplaying, if applicable
+     */
+    skip = async (
+        trackNumber: number,
+        force: boolean = false,
+    ): Promise<YouTubeVideo | null> => {
+        const isAlreadyPlaying = force
+            ? false // short circuit if forcing skip
+            : trackNumber === this._trackAt &&
+              this.state.status === AudioPlayerStatus.Playing;
+        const isInvalid =
+            trackNumber < 1 ||
+            trackNumber > this.tracks.length ||
+            isAlreadyPlaying;
+        if (isInvalid) return null;
+
+        this._trackAt = trackNumber;
+        return this.playTrack(this.tracks[this._trackAt - 1]);
     };
 
     // Attempts to parse mode string
@@ -206,7 +309,7 @@ export default class MusicPlayer extends AudioPlayer {
 
     /**
      * Adjust stream quality
-     * @param {StreamQuality} quality stream quality
+     * @param {StreamQuality} quality Stream quality: 0 - lowest, 1 - medium, 2 - highest
      */
     setQuality = (quality: StreamQuality) => {
         // TODO: maybe do some rounding or something
@@ -218,56 +321,60 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * Start countdown to disconnect from voice.
      */
-    setIdleTimeout = () => {
-        if (!this.timeout) {
-            this.stopCalled = false;
-            this.timeout = setTimeout(() => {
-                console.debug('Idle disconnect, goodbye!');
-                this.disconnect();
-            }, this.idleTimer);
-        }
+    setIdleTimeout = (): void => {
+        // Reset timeout if already exists
+        this.clearTimeout();
+        // no longer need if check - we are certain that timeout is clear.
+        this.stopCalled = false;
+        this.timeout = setTimeout(() => {
+            console.debug('Idle disconnect, goodbye!');
+            this.disconnect();
+        }, this.idleTimer);
     };
 
     /**
      * Cancel idle disconnect countdown
      */
-    clearTimeout = () => {
+    clearTimeout = (): void => {
         clearTimeout(this.timeout);
         this.timeout = undefined;
     };
 
     // === State change effects! ===
 
+    /**
+     * onPlay callback handler. Clears the idle timeout.
+     */
     private onPlay = (): void => {
         console.debug('Playing!');
         this.clearTimeout();
     };
 
     /**
-     * Handles next track behavior
+     * Handles next track behavior, or restarts idle timer.
      */
     private onIdle = async (): Promise<void> => {
-        console.log('noConnection', !this.connection);
+        console.debug('Idle!');
         // bail early
         if (!this.connection || this.stopCalled) {
             this.setIdleTimeout();
             return;
         }
 
+        // Continue queue
         let metadata;
-
         if (this.loopMode === LoopMode.CURRENT) {
-            metadata = await this.playTrack(this.tracks[this.trackAt - 1]);
+            metadata = await this.playTrack(this.tracks[this._trackAt - 1]);
         } else {
             metadata = await this.next();
         }
-
         // TODO: update message in channel
         if (metadata) {
             console.log(`now playing ${metadata?.title}`);
             return;
         }
 
+        // Otherwise, restart idle countdown.
         this.setIdleTimeout();
     };
 
@@ -289,6 +396,8 @@ export default class MusicPlayer extends AudioPlayer {
 
     // eslint-disable-next-line class-methods-use-this
     private onAutoPause = (): void => {
+        // Note that this is only possible when noSubscriber behavior is set to
+        // 'Pause' - meaning no active voice connections. Resumes when connection resumes
         console.debug('AutoPause!');
     };
 

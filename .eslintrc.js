@@ -72,5 +72,6 @@ module.exports = {
         quotes: ['error', 'single', { avoidEscape: true }],
         'no-shadow': 'off', // https://stackoverflow.com/questions/63961803/eslint-says-all-enums-in-typescript-app-are-already-declared-in-the-upper-scope
         camelcase: 'off',
+        'no-underscore-dangle': ['error', { allowAfterThis: true }],
     },
 };
