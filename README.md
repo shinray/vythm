@@ -28,6 +28,7 @@ are emitted by Client and need to be handled with an event handler
     -> interactionhandler -> command code
 
 ## TODO
+
 -   create infrastructure for sending messages, instead of writing strings...
 -   view queue, pagination
 -   play/plause/resume
