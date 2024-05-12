@@ -36,7 +36,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
         const query = interaction.options.get(this.options[0].name, true)
             .value as string;
         const metadata = await search(query);
-        if (!metadata) {
+        if (!metadata?.length) {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
@@ -56,7 +56,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
         }
 
         await interaction.editReply(
-            `inserted ${metadata.title} at position ${nextTrackAt}, `,
+            `inserted ${metadata[0].title} at position ${nextTrackAt}, `,
         );
     };
 }

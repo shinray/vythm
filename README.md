@@ -28,8 +28,14 @@ are emitted by Client and need to be handled with an event handler
     -> interactionhandler -> command code
 
 ## TODO
-
+-   create infrastructure for sending messages, instead of writing strings...
+-   view queue, pagination
+-   play/plause/resume
+-   maybe add other features too? time to resurrect xkcd-thief
+-   fix yarn/npm confusion
+-   fix tslint/eslint confusion
 -   clean up comments
 -   set up dotenv for secrets
 -   add unit testing
 -   dockerize!
+-   deploy to shinray's raspi

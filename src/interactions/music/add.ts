@@ -35,22 +35,20 @@ export default class Add extends Interaction<CommandInteraction> {
         const query = interaction.options.get(this.options[0].name, true)
             .value as string;
         const metadata = await search(query);
-        if (!metadata) {
+        if (!metadata?.length) {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
 
         const trackNumberOption = interaction.options.get('tracknumber');
         if (trackNumberOption) {
-            // TODO: remove
-            console.debug('trackNumberOption', trackNumberOption);
             const trackNumber = trackNumberOption.value as number;
             player.insert(metadata, trackNumber);
 
             const response =
                 'added track: ' +
-                `[${metadata?.title}](${metadata?.url}) ` +
-                `(${metadata?.durationRaw}), ` +
+                `[${metadata[0].title}](${metadata[0].url}) ` +
+                `(${metadata[0].durationRaw}), ` +
                 `requested by ${member.displayName}`;
             await interaction.editReply(response);
         } else {
@@ -67,8 +65,8 @@ export default class Add extends Interaction<CommandInteraction> {
             const track = await player.add(metadata);
             await interaction.editReply(
                 `added track to #${track}:` +
-                    `[${metadata?.title}](${metadata?.url}) ` +
-                    `(${metadata?.durationRaw}), ` +
+                    `[${metadata[0].title}](${metadata[0].url}) ` +
+                    `(${metadata[0].durationRaw}), ` +
                     `requested by ${member.displayName}`,
             );
         }

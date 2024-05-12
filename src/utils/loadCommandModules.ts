@@ -18,7 +18,6 @@ const loadCommandModules = (
     files.forEach((file) => {
         const filePath = path.join(dirPath, file);
         if (fs.statSync(filePath).isDirectory()) {
-            // TODO: test that this actually recurses properly
             fileArray = loadCommandModules(filePath, fileArray);
         } else {
             fileArray.push(filePath);

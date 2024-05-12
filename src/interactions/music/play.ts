@@ -37,21 +37,26 @@ export default class Play extends Interaction<CommandInteraction> {
 
         const query = interaction.options.get(this.options[0].name, true)
             .value as string;
-        const metadata = await search(query);
-        if (!metadata) {
-            await interaction.editReply(`no results for query ${query}`);
-            return;
+        try {
+            const metadata = await search(query);
+            if (!metadata?.length) {
+                await interaction.editReply(`no results for query ${query}`);
+                return;
+            }
+
+            player.connect(voiceChannel);
+
+            const trackAt = await player.add(metadata);
+            // TODO: add something in the message about how many tracks we just queued, maybe playlist info
+            await interaction.editReply(
+                `now playing #${trackAt}: ` +
+                    `[${metadata[0].title}](${metadata[0].url}) ` +
+                    `(${metadata[0].durationRaw}), ` +
+                    `requested by ${member.displayName}`,
+            );
+        } catch (e) {
+            const error = e as Error;
+            await interaction.editReply(error.message);
         }
-
-        player.connect(voiceChannel);
-
-        const trackAt = await player.add(metadata);
-
-        await interaction.editReply(
-            `now playing #${trackAt}: ` +
-                `[${metadata?.title}](${metadata?.url}) ` +
-                `(${metadata?.durationRaw}), ` +
-                `requested by ${member.displayName}`,
-        );
     };
 }

@@ -55,12 +55,16 @@ export default class MusicPlayer extends AudioPlayer {
 
     private connection: VoiceConnection | undefined;
 
-    private tracks: YouTubeVideo[] = [];
+    private _tracks: YouTubeVideo[] = [];
+
+    public get tracks(): YouTubeVideo[] {
+        return this._tracks;
+    }
 
     // Track position index. One-based index, vs tracks[] zero-based
     private _trackAt: number = 0;
 
-    get trackAt(): number {
+    public get trackAt(): number {
         return this._trackAt;
     }
 
@@ -119,45 +123,60 @@ export default class MusicPlayer extends AudioPlayer {
 
     /**
      * Adds a track to the end of the play queue, and starts playback if idle
-     * @param track Audio to be queued
+     * @param {YouTubeVideo[]} track Audio to be queued
      * @returns {number} length of queue (queue position)
      */
-    add = async (track: YouTubeVideo): Promise<number> => {
-        this.tracks.push(track);
+    add = async (track: YouTubeVideo[]): Promise<number> => {
+        const prevTracksLength = this._tracks.length;
+        this._tracks.push(...track);
 
-        console.debug('Player.Add! Current tracklist size', this.tracks.length);
+        console.debug(
+            'Player.Add! Current tracklist size',
+            this._tracks.length,
+        );
 
         const isNotPlaying =
-            this.tracks.length === 1 || // queue was empty and we just pushed
+            prevTracksLength === 0 || // queue was empty and we just pushed
             this.state.status === AudioPlayerStatus.Idle;
         if (isNotPlaying) {
-            this._trackAt = this.tracks.length;
-            console.debug(`playing track ${track.title}`);
-            await this.playTrack(track);
+            this._trackAt = prevTracksLength + 1;
+            console.debug(`playing track ${track[0].title}`);
+            await this.playTrack(track[0]);
         }
 
         // returns queue position
-        return this.tracks.length;
+        return prevTracksLength + 1;
     };
 
     /**
      * Inserts a track into the play queue at a specified position. Does not affect playback.
-     * @param track Audio to insert
+     * @param {YouTubeVideo[]} track Audio to insert
      * @param {number} trackNumber index to insert into
      */
-    insert = (track: YouTubeVideo, trackNumber: number) => {
+    insert = (track: YouTubeVideo[], trackNumber: number) => {
         // handle negative floor
         if (trackNumber < 0) {
-            this.tracks.unshift(track);
-            if (this._trackAt !== 0) this._trackAt += 1; // adjust positions
+            // Because we're unshift()ing, need to unshift in reverse order.
+            track.reverse().forEach((t) => {
+                this._tracks.unshift(t);
+            });
+            // Adjust positions
+            if (this._trackAt !== 0) this._trackAt += track.length;
         }
         // handle positive ceiling.
-        else if (trackNumber >= this.tracks.length) this.tracks.push(track);
+        else if (trackNumber >= this._tracks.length) {
+            track.forEach((t) => {
+                this._tracks.push(t);
+            });
+        }
         // Honestly, the above two cases are pretty unlikely. We shouldn't be too smart
         // about it and just let it happen.
         else {
-            this.tracks.splice(trackNumber, 0, track);
-            if (this._trackAt >= trackNumber) this._trackAt += 1; // adjust positions
+            track.reverse().forEach((t) => {
+                this._tracks.splice(trackNumber, 0, t);
+            });
+            // Adjust positions
+            if (this._trackAt >= trackNumber) this._trackAt += track.length;
         }
     };
 
@@ -167,7 +186,7 @@ export default class MusicPlayer extends AudioPlayer {
      * @param track track to insert immediately
      * @returns {number} next track position
      */
-    insertNext = (track: YouTubeVideo): number => {
+    insertNext = (track: YouTubeVideo[]): number => {
         // index is zero based, but conveniently, we want the next track anyway
         // so trackAt += 1; trackAt -=1, balances out
         this.insert(track, this._trackAt);
@@ -181,21 +200,21 @@ export default class MusicPlayer extends AudioPlayer {
      */
     remove = (trackNumber: number): YouTubeVideo | null => {
         const isInvalid =
-            trackNumber < 0 || trackNumber - 1 > this.tracks.length;
+            trackNumber < 0 || trackNumber - 1 > this._tracks.length;
         if (isInvalid) return null;
 
         // Get currently playing, if applicable
         let track: YouTubeVideo | undefined;
         if (this._trackAt !== 0) {
-            track = this.tracks[this._trackAt - 1];
+            track = this._tracks[this._trackAt - 1];
         }
 
-        const removedTrack = this.tracks.splice(trackNumber - 1, 1);
+        const removedTrack = this._tracks.splice(trackNumber - 1, 1);
 
         // Update current track position, if applicable
         if (track) {
             this._trackAt =
-                this.tracks.findIndex((t) => t.id === track?.id) + 1;
+                this._tracks.findIndex((t) => t.id === track?.id) + 1;
         }
 
         return removedTrack.length > 0 ? removedTrack[0] : null;
@@ -259,12 +278,12 @@ export default class MusicPlayer extends AudioPlayer {
      */
     next = async (): Promise<YouTubeVideo | null> => {
         // Advance track counter, or handle looping.
-        if (this._trackAt < this.tracks.length) this._trackAt += 1;
+        if (this._trackAt < this._tracks.length) this._trackAt += 1;
         else if (this.loopMode === LoopMode.ALL) this._trackAt = 1;
         else if (this.loopMode === LoopMode.OFF) return null; // end of queue
         // TODO: should we replay final track, or stop, or do nothing?
 
-        return this.playTrack(this.tracks[this._trackAt - 1]);
+        return this.playTrack(this._tracks[this._trackAt - 1]);
     };
 
     /**
@@ -275,7 +294,7 @@ export default class MusicPlayer extends AudioPlayer {
         if (this._trackAt <= 1) return null;
 
         this._trackAt -= 1;
-        return this.playTrack(this.tracks[this._trackAt - 1]);
+        return this.playTrack(this._tracks[this._trackAt - 1]);
     };
 
     /**
@@ -294,12 +313,12 @@ export default class MusicPlayer extends AudioPlayer {
               this.state.status === AudioPlayerStatus.Playing;
         const isInvalid =
             trackNumber < 1 ||
-            trackNumber > this.tracks.length ||
+            trackNumber > this._tracks.length ||
             isAlreadyPlaying;
         if (isInvalid) return null;
 
         this._trackAt = trackNumber;
-        return this.playTrack(this.tracks[this._trackAt - 1]);
+        return this.playTrack(this._tracks[this._trackAt - 1]);
     };
 
     // Attempts to parse mode string
@@ -364,7 +383,7 @@ export default class MusicPlayer extends AudioPlayer {
         // Continue queue
         let metadata;
         if (this.loopMode === LoopMode.CURRENT) {
-            metadata = await this.playTrack(this.tracks[this._trackAt - 1]);
+            metadata = await this.playTrack(this._tracks[this._trackAt - 1]);
         } else {
             metadata = await this.next();
         }
