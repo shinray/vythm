@@ -1,9 +1,3 @@
-/* eslint @typescript-eslint/no-unsafe-return: "warn" */
-/* eslint @typescript-eslint/no-unsafe-member-access: "warn" */
-/* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
-/* eslint @typescript-eslint/no-explicit-any: "warn" */
-/* eslint @typescript-eslint/require-await: "warn" */
-/* eslint class-methods-use-this: "warn" */
 // TODO: replace all instances of 'any' i.e. track/track metadata.
 // Need to find some kind of type that unifies yt, spotify, soundcloud, deezer...
 /**
@@ -228,7 +222,9 @@ export default class MusicPlayer extends AudioPlayer {
     // calling super in an arrow fn is no gucci
     async playTrack(track: YouTubeVideo) {
         try {
-            const audioResource = await createStream(track); // TODO: use this.quality
+            const audioResource = await createStream(track, {
+                quality: this.quality,
+            });
             console.debug('AudioResource', audioResource);
             super.play(audioResource);
         } catch (e) {
