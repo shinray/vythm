@@ -37,7 +37,7 @@ import {
     VoiceConnection,
     joinVoiceChannel,
 } from '@discordjs/voice';
-import { VoiceChannel } from 'discord.js';
+import { TextChannel, VoiceChannel } from 'discord.js';
 import { YouTubeVideo } from 'play-dl';
 import DiscordClient from './client';
 import { LoopMode } from '../types/LoopMode';
@@ -49,7 +49,7 @@ export default class MusicPlayer extends AudioPlayer {
 
     readonly guildId: string;
 
-    private channelId: string | undefined; // text channel
+    private lastKnownTextChannel: TextChannel | undefined; // text channel
 
     private voiceChannelId: string | undefined;
 
@@ -93,12 +93,14 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * Commands instance to join a voice channel. Has idle timeout.
      * @param {VoiceChannel} voiceChannel Discord voice channel object
+     * @param {TextChannel} textChannel Discord text channel object
      * @returns {void}
      */
-    connect = (voiceChannel: VoiceChannel): void => {
+    connect = (voiceChannel: VoiceChannel, textChannel?: TextChannel): void => {
         // Dedupe
         if (this.voiceChannelId === voiceChannel.id) return;
         this.voiceChannelId = voiceChannel.id;
+        if (textChannel) this.lastKnownTextChannel = textChannel;
         this.connection = joinVoiceChannel({
             guildId: this.guildId,
             channelId: this.voiceChannelId,
@@ -151,11 +153,12 @@ export default class MusicPlayer extends AudioPlayer {
     /**
      * Inserts a track into the play queue at a specified position. Does not affect playback.
      * @param {YouTubeVideo[]} track Audio to insert
-     * @param {number} trackNumber index to insert into
+     * @param {number} trackNumber index to insert into (one-indexed)
      */
     insert = (track: YouTubeVideo[], trackNumber: number) => {
+        const adjustedTrackNumber = trackNumber - 1; // This function should accept the human-friendly index and compensate automatically.
         // handle negative floor
-        if (trackNumber < 0) {
+        if (adjustedTrackNumber < 0) {
             // Because we're unshift()ing, need to unshift in reverse order.
             track.reverse().forEach((t) => {
                 this._tracks.unshift(t);
@@ -164,7 +167,7 @@ export default class MusicPlayer extends AudioPlayer {
             if (this._trackAt !== 0) this._trackAt += track.length;
         }
         // handle positive ceiling.
-        else if (trackNumber >= this._tracks.length) {
+        else if (adjustedTrackNumber >= this._tracks.length) {
             track.forEach((t) => {
                 this._tracks.push(t);
             });
@@ -173,7 +176,7 @@ export default class MusicPlayer extends AudioPlayer {
         // about it and just let it happen.
         else {
             track.reverse().forEach((t) => {
-                this._tracks.splice(trackNumber, 0, t);
+                this._tracks.splice(adjustedTrackNumber, 0, t);
             });
             // Adjust positions
             if (this._trackAt >= trackNumber) this._trackAt += track.length;
@@ -189,7 +192,7 @@ export default class MusicPlayer extends AudioPlayer {
     insertNext = (track: YouTubeVideo[]): number => {
         // index is zero based, but conveniently, we want the next track anyway
         // so trackAt += 1; trackAt -=1, balances out
-        this.insert(track, this._trackAt);
+        this.insert(track, this._trackAt + 1);
         return this._trackAt + 1;
     };
 
@@ -321,6 +324,30 @@ export default class MusicPlayer extends AudioPlayer {
         return this.playTrack(this._tracks[this._trackAt - 1]);
     };
 
+    /**
+     * Shuffles the current tracklist
+     * @returns {YouTubeVideo[]} the current playlist
+     */
+    shuffle = (): YouTubeVideo[] => {
+        // Fisher-Yates algorithm
+        for (let i = this._tracks.length - 1; i > 0; i -= 1) {
+            // Generate a random index between 0 and i, inclusive
+            const j = Math.floor(Math.random() * (i + 1));
+            // Swap the elements at indices i and j
+            [this._tracks[i], this._tracks[j]] = [
+                this._tracks[j],
+                this._tracks[i],
+            ];
+            // Update track index, if necessary
+            if (this._trackAt === i + 1) {
+                this._trackAt = j + 1;
+            } else if (this._trackAt === j + 1) {
+                this._trackAt = i + 1;
+            }
+        }
+        return this._tracks;
+    };
+
     // Attempts to parse mode string
     setLoopMode = (mode: string) => {
         this.loopMode = (mode as LoopMode) || LoopMode.OFF;
@@ -390,6 +417,10 @@ export default class MusicPlayer extends AudioPlayer {
         // TODO: update message in channel
         if (metadata) {
             console.log(`now playing ${metadata?.title}`);
+            if (this.lastKnownTextChannel)
+                await this.lastKnownTextChannel.send(
+                    `now playing #${this._trackAt} - [${metadata?.title}](${metadata?.url})`,
+                );
             return;
         }
 
