@@ -4,11 +4,12 @@ import Interaction from '../models/Interaction';
 export default class Help extends Interaction<CommandInteraction> {
     name = 'help';
 
-    description = 'Quickstart guide to commands';
+    description = 'Have you tried turning it off and on again?';
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        console.debug('help command received');
-        await interaction.editReply('Coming soon!');
+        await interaction.editReply(
+            "Help me, <@139955792093773825>, you're my only hope!",
+        );
     };
 }

@@ -1,5 +1,8 @@
 import DiscordClient from './client';
 
+/**
+ * Class representing any Discord event.
+ */
 export default class DiscordEvent {
     readonly client: DiscordClient;
 
@@ -7,6 +10,10 @@ export default class DiscordEvent {
 
     once: boolean = false;
 
+    /**
+     * Handler that processes effects for this given event.
+     * @param _args Arguments to pass to script.
+     */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     execute = (..._args: unknown[]): Promise<void> => {
         console.error(

@@ -5,6 +5,9 @@ import DiscordEvent from '../models/Event';
 import loadCommandModules from '../utils/loadCommandModules';
 import type { EventConstructor } from '../types/definitions';
 
+/**
+ * Registers Events that the bot will handle.
+ */
 export default class EventHandler extends Collection<string, DiscordEvent> {
     readonly client: DiscordClient;
 
@@ -13,11 +16,14 @@ export default class EventHandler extends Collection<string, DiscordEvent> {
         this.client = client;
     }
 
+    /**
+     * Reads folder and loads Events.
+     */
     init = async () => {
         const folder = 'events';
         const path = join(__dirname, '..', folder);
         const files = loadCommandModules(path);
-        console.debug('event modules', files);
+        console.debug('Discovered event modules', files);
         await Promise.all(
             files.map(async (file) => {
                 const module = (await import(file)) as {

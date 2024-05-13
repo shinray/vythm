@@ -6,6 +6,9 @@ A discord bot in Node.js
 
 -   Node 16
 -   Discord.js
+-   -   @discordjs/voice
+-   libsodium-wrappers
+-   ffmpeg-static
 
 ## Notes
 
@@ -26,7 +29,14 @@ are emitted by Client and need to be handled with an event handler
 
 ## TODO
 
+-   create infrastructure for sending messages, instead of writing strings...
+-   view queue, pagination
+-   play/plause/resume
+-   maybe add other features too? time to resurrect xkcd-thief
+-   fix yarn/npm confusion
+-   fix tslint/eslint confusion
 -   clean up comments
 -   set up dotenv for secrets
--   actually import dl library and do the work
 -   add unit testing
+-   dockerize!
+-   deploy to shinray's raspi

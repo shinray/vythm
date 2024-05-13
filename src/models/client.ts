@@ -1,9 +1,13 @@
 import { Client, GatewayIntentBits } from 'discord.js';
-import config from '../config.json';
+import configJson from '../config.json';
 import InteractionHandler from '../handlers/interactionHandler';
 import EventHandler from '../handlers/eventHandler';
+import MusicHandler from '../handlers/musicHandler';
+import { VythmConfig } from '../types/definitions';
 
 export default class DiscordClient extends Client {
+    private config: VythmConfig = configJson;
+
     public caches = {};
 
     // client Ready event will actually initialize and register everything.
@@ -11,13 +15,16 @@ export default class DiscordClient extends Client {
 
     public interactions = new InteractionHandler(this);
 
+    // Active music clients (one per guild)
+    public musicPlayers = new MusicHandler(this);
+
     constructor() {
         super({
             intents: [
                 GatewayIntentBits.Guilds,
-                // GatewayIntentBits.GuildMessages,
-                // GatewayIntentBits.GuildPresences,
-                // GatewayIntentBits.GuildVoiceStates,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildPresences,
+                GatewayIntentBits.GuildVoiceStates,
             ],
         });
 
@@ -25,6 +32,7 @@ export default class DiscordClient extends Client {
     }
 
     private init = () => {
+        const { token } = this.config;
         this.events
             .init()
             .then(() => {
@@ -36,12 +44,12 @@ export default class DiscordClient extends Client {
         this.interactions
             .init()
             .then(() => {
-                console.debug('Initialized UnteractionHandler');
+                console.debug('Initialized InteractionHandler');
             })
             .catch((error) => {
                 console.error('Error initializing InteractionHandler', error);
             });
-        this.login(config.token)
+        this.login(token)
             .then(() => {
                 console.log('Login successful.');
             })

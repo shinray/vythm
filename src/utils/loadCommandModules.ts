@@ -12,13 +12,12 @@ const loadCommandModules = (
     accumulator?: string[],
 ): string[] => {
     const files = fs.readdirSync(dirPath);
-    console.debug('files', files);
+    console.debug(`files in path ${dirPath}:`, files);
     let fileArray = accumulator ? [...accumulator] : [];
 
     files.forEach((file) => {
         const filePath = path.join(dirPath, file);
         if (fs.statSync(filePath).isDirectory()) {
-            // TODO: test that this actually recurses properly
             fileArray = loadCommandModules(filePath, fileArray);
         } else {
             fileArray.push(filePath);

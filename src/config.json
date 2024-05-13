@@ -1,4 +1,5 @@
 {
     "token": "TOKEN-GOES-HERE",
-    "clientId": "applicationidGoesHere"
+    "clientId": "applicationidGoesHere",
+    "guildId": "guildidGoesHere"
 }

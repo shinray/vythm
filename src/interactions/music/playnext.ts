@@ -4,15 +4,14 @@ import {
     SlashCommandStringOption,
     VoiceChannel,
 } from 'discord.js';
+import { AudioPlayerStatus } from '@discordjs/voice';
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
 
-// TODO: add behavior for pause/unpause/resume
+export default class PlayNext extends Interaction<CommandInteraction> {
+    name = 'playnext';
 
-export default class Play extends Interaction<CommandInteraction> {
-    name = 'play';
-
-    description = 'play with me';
+    description = 'play something next in queue';
 
     options = [
         new SlashCommandStringOption()
@@ -26,7 +25,6 @@ export default class Play extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
-        // const memberChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -37,26 +35,28 @@ export default class Play extends Interaction<CommandInteraction> {
 
         const query = interaction.options.get(this.options[0].name, true)
             .value as string;
-        try {
-            const metadata = await search(query);
-            if (!metadata?.length) {
-                await interaction.editReply(`no results for query ${query}`);
-                return;
-            }
+        const metadata = await search(query);
+        if (!metadata?.length) {
+            await interaction.editReply(`no results for query ${query}`);
+            return;
+        }
 
-            player.connect(voiceChannel);
+        player.connect(voiceChannel);
 
-            const trackAt = await player.add(metadata);
-            // TODO: add something in the message about how many tracks we just queued, maybe playlist info
+        const nextTrackAt = player.insertNext(metadata);
+        if (player.state.status === AudioPlayerStatus.Idle) {
+            const track = await player.skip(nextTrackAt);
             await interaction.editReply(
-                `now playing #${trackAt}: ` +
-                    `[${metadata[0].title}](${metadata[0].url}) ` +
-                    `(${metadata[0].durationRaw}), ` +
+                `now playing #${nextTrackAt}: ` +
+                    `[${track?.title}](${track?.url}) ` +
+                    `(${track?.durationRaw}), ` +
                     `requested by ${member.displayName}`,
             );
-        } catch (e) {
-            const error = e as Error;
-            await interaction.editReply(error.message);
+            return;
         }
+
+        await interaction.editReply(
+            `inserted ${metadata[0].title} at position ${nextTrackAt}, `,
+        );
     };
 }
