@@ -3,6 +3,7 @@ import {
     GuildMember,
     SlashCommandStringOption,
     VoiceChannel,
+    TextChannel,
 } from 'discord.js';
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
@@ -26,7 +27,7 @@ export default class Play extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
-        // const memberChannel = interaction.channel as TextChannel;
+        const memberChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -44,7 +45,7 @@ export default class Play extends Interaction<CommandInteraction> {
                 return;
             }
 
-            player.connect(voiceChannel);
+            player.connect(voiceChannel, memberChannel);
 
             const trackAt = await player.add(metadata);
             // TODO: add something in the message about how many tracks we just queued, maybe playlist info

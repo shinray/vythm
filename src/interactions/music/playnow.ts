@@ -2,6 +2,7 @@ import {
     CommandInteraction,
     GuildMember,
     SlashCommandStringOption,
+    TextChannel,
     VoiceChannel,
 } from 'discord.js';
 import Interaction from '../../models/Interaction';
@@ -25,6 +26,7 @@ export default class PlayNow extends Interaction<CommandInteraction> {
         );
 
         const member = interaction.member as GuildMember;
+        const textChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -41,7 +43,7 @@ export default class PlayNow extends Interaction<CommandInteraction> {
             return;
         }
 
-        player.connect(voiceChannel);
+        player.connect(voiceChannel, textChannel);
 
         const nextTrackAt = player.insertNext(metadata);
         const track = await player.skip(nextTrackAt, true); // force skip current song

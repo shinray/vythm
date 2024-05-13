@@ -2,6 +2,7 @@ import {
     CommandInteraction,
     GuildMember,
     SlashCommandStringOption,
+    TextChannel,
     VoiceChannel,
 } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
@@ -25,6 +26,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
+        const textChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -41,7 +43,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
             return;
         }
 
-        player.connect(voiceChannel);
+        player.connect(voiceChannel, textChannel);
 
         const nextTrackAt = player.insertNext(metadata);
         if (player.state.status === AudioPlayerStatus.Idle) {
@@ -56,7 +58,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
         }
 
         await interaction.editReply(
-            `inserted ${metadata[0].title} at position ${nextTrackAt}, `,
+            `inserted ${metadata[0].title} at position ${nextTrackAt}`,
         );
     };
 }

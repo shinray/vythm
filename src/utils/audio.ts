@@ -22,7 +22,6 @@ export const createStream = async (
     metadata: play.YouTubeVideo | any,
     options: StreamOptions = { quality: StreamQuality.LOWEST },
 ): Promise<AudioResource<any>> => {
-    console.debug('Create Stream!', metadata?.url);
     const streamOptions = options;
     const { stream, type } = await play.stream(metadata.url, streamOptions);
 

@@ -4,6 +4,7 @@ import {
     SlashCommandIntegerOption,
     SlashCommandStringOption,
     VoiceChannel,
+    TextChannel,
 } from 'discord.js';
 import { search } from '../../services/search';
 import Interaction from '../../models/Interaction';
@@ -53,7 +54,7 @@ export default class Add extends Interaction<CommandInteraction> {
             await interaction.editReply(response);
         } else {
             // We should assume you want to connect and play.
-            // const memberChannel = interaction.channel as TextChannel;
+            const memberChannel = interaction.channel as TextChannel;
             const voiceChannel = member.voice.channel as VoiceChannel;
             if (!voiceChannel) {
                 await interaction.editReply(
@@ -61,10 +62,10 @@ export default class Add extends Interaction<CommandInteraction> {
                 );
                 return;
             }
-            player.connect(voiceChannel);
+            player.connect(voiceChannel, memberChannel);
             const track = await player.add(metadata);
             await interaction.editReply(
-                `added track to #${track}:` +
+                `added track to #${track}: ` +
                     `[${metadata[0].title}](${metadata[0].url}) ` +
                     `(${metadata[0].durationRaw}), ` +
                     `requested by ${member.displayName}`,
