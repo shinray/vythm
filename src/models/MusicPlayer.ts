@@ -1,5 +1,4 @@
-// TODO: replace all instances of 'any' i.e. track/track metadata.
-// Need to find some kind of type that unifies yt, spotify, soundcloud, deezer...
+// TODO: Need to find some kind of type that unifies yt, spotify, soundcloud, deezer...
 /**
  * What does MusicPlayer need to do?
  * * Unique to guild
@@ -41,9 +40,9 @@ import { createStream } from '../utils/audio';
 export default class MusicPlayer extends AudioPlayer {
     readonly client: DiscordClient;
 
-    readonly guildId: string;
+    readonly guildId: string; // multiple discord support
 
-    private lastKnownTextChannel: TextChannel | undefined; // text channel
+    private lastKnownTextChannel: TextChannel | undefined; // text channel the bot talks in. going to assume to use the last textchannel that a command was issued from.
 
     private voiceChannelId: string | undefined;
 
@@ -342,6 +341,19 @@ export default class MusicPlayer extends AudioPlayer {
             }
         }
         return this._tracks;
+    };
+
+    /**
+     * Clears the queue. Resets tracks and trackAt to initial value.
+     * @returns {number} size of queue before purge
+     */
+    clear = (): number => {
+        const queueLength = this._tracks.length;
+
+        this._tracks = [];
+        this._trackAt = 0;
+
+        return queueLength;
     };
 
     // Attempts to parse mode string
