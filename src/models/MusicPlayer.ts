@@ -42,7 +42,8 @@ export default class MusicPlayer extends AudioPlayer {
 
     readonly guildId: string; // multiple discord support
 
-    private lastKnownTextChannel: TextChannel | undefined; // text channel the bot talks in. going to assume to use the last textchannel that a command was issued from.
+    private lastKnownTextChannel: TextChannel | undefined; // text channel the bot talks in.
+    // going to assume to use the last textchannel that a command was issued from.
 
     private voiceChannelId: string | undefined;
 
