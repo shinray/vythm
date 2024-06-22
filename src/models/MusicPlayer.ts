@@ -230,6 +230,11 @@ export default class MusicPlayer extends AudioPlayer {
         } catch (e) {
             console.error('Error playing track', e);
         }
+        if (this.lastKnownTextChannel)
+            await this.lastKnownTextChannel.send(
+                `now playing #${this._trackAt} - [${track?.title}](${track?.url}) ` +
+                    `(${track.durationRaw})`,
+            );
         return track;
     }
 
@@ -426,10 +431,11 @@ export default class MusicPlayer extends AudioPlayer {
         // TODO: update message in channel
         if (metadata) {
             console.log(`now playing ${metadata?.title}`);
-            if (this.lastKnownTextChannel)
-                await this.lastKnownTextChannel.send(
-                    `now playing #${this._trackAt} - [${metadata?.title}](${metadata?.url})`,
-                );
+            // Moved to playTrack().
+            // if (this.lastKnownTextChannel)
+            //     await this.lastKnownTextChannel.send(
+            //         `now playing #${this._trackAt} - [${metadata?.title}](${metadata?.url})`,
+            //     );
             return;
         }
 

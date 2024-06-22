@@ -46,12 +46,10 @@ export default class PlayNow extends Interaction<CommandInteraction> {
         player.connect(voiceChannel, textChannel);
 
         const nextTrackAt = player.insertNext(metadata);
-        const track = await player.skip(nextTrackAt, true); // force skip current song
+        await player.skip(nextTrackAt, true); // force skip current song
         const response =
             'skipping track!\n' +
-            `now playing #${nextTrackAt}: ` +
-            `[${track?.title}](${track?.url}) ` +
-            `(${track?.durationRaw}), ` +
+            `searching for ${query}\n` +
             `requested by ${member.displayName}`;
 
         await interaction.editReply(response);

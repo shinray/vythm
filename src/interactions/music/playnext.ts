@@ -47,18 +47,19 @@ export default class PlayNext extends Interaction<CommandInteraction> {
 
         const nextTrackAt = player.insertNext(metadata);
         if (player.state.status === AudioPlayerStatus.Idle) {
-            const track = await player.skip(nextTrackAt);
+            await player.skip(nextTrackAt);
             await interaction.editReply(
-                `now playing #${nextTrackAt}: ` +
-                    `[${track?.title}](${track?.url}) ` +
-                    `(${track?.durationRaw}), ` +
+                `searching for ${query}, ` +
+                    `enqueuing ${metadata.length} tracks at position ${nextTrackAt}, ` +
                     `requested by ${member.displayName}`,
             );
             return;
         }
 
         await interaction.editReply(
-            `inserted ${metadata[0].title} at position ${nextTrackAt}`,
+            `searching for ${query}` +
+                `inserted ${metadata[0].title} at position ${nextTrackAt}` +
+                `requested by ${member.displayName}`,
         );
     };
 }
