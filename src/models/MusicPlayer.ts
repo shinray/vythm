@@ -428,19 +428,14 @@ export default class MusicPlayer extends AudioPlayer {
         } else {
             metadata = await this.next();
         }
-        // TODO: update message in channel
+
         if (metadata) {
             console.log(`now playing ${metadata?.title}`);
             // Moved to playTrack().
-            // if (this.lastKnownTextChannel)
-            //     await this.lastKnownTextChannel.send(
-            //         `now playing #${this._trackAt} - [${metadata?.title}](${metadata?.url})`,
-            //     );
-            return;
+        } else {
+            // Otherwise, restart idle countdown.
+            this.setIdleTimeout();
         }
-
-        // Otherwise, restart idle countdown.
-        this.setIdleTimeout();
     };
 
     /**
