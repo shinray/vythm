@@ -37,7 +37,8 @@ are emitted by Client and need to be handled with an event handler
 -   now playing (and timestamp of current song)
 -   seek (this may be impossible)
 -   maybe add other features too? time to resurrect xkcd-thief
--   investigate other stream downloader backends, since play-dl may not be actively developed
+-   investigate other stream downloader backends, since play-dl may not be
+    actively developed
 -   fix yarn/npm confusion
 -   fix tslint/eslint confusion
 -   setup a real logger instead of this console.log stuff
