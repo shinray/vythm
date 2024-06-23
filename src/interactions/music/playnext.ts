@@ -43,22 +43,24 @@ export default class PlayNext extends Interaction<CommandInteraction> {
             return;
         }
 
+        let tracklist = '';
+        metadata.forEach((t, index) => {
+            tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
+                t.durationRaw
+            })\n`;
+        });
+
         player.connect(voiceChannel, textChannel);
 
         const nextTrackAt = player.insertNext(metadata);
         if (player.state.status === AudioPlayerStatus.Idle) {
             await player.skip(nextTrackAt);
-            await interaction.editReply(
-                `searching for ${query}, ` +
-                    `enqueuing ${metadata.length} tracks at position ${nextTrackAt}, ` +
-                    `requested by ${member.displayName}`,
-            );
-            return;
         }
 
         await interaction.editReply(
-            `searching for ${query}` +
-                `inserted ${metadata[0].title} at position ${nextTrackAt}` +
+            `searching for ${query}\n` +
+                `found ${tracklist}` +
+                `enqueuing ${metadata.length} tracks at position ${nextTrackAt}, ` +
                 `requested by ${member.displayName}`,
         );
     };

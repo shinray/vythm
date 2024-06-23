@@ -42,6 +42,12 @@ export default class PlayNow extends Interaction<CommandInteraction> {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
+        let tracklist = '';
+        metadata.forEach((t, index) => {
+            tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
+                t.durationRaw
+            })\n`;
+        });
 
         player.connect(voiceChannel, textChannel);
 
@@ -50,6 +56,8 @@ export default class PlayNow extends Interaction<CommandInteraction> {
         const response =
             'skipping track!\n' +
             `searching for ${query}\n` +
+            `found ${tracklist}` +
+            `enqueuing ${metadata.length} tracks at position ${nextTrackAt}, ` +
             `requested by ${member.displayName}`;
 
         await interaction.editReply(response);

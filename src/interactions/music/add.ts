@@ -40,6 +40,12 @@ export default class Add extends Interaction<CommandInteraction> {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
+        let tracklist = '';
+        metadata.forEach((t, index) => {
+            tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
+                t.durationRaw
+            })\n`;
+        });
 
         const trackNumberOption = interaction.options.get('tracknumber');
         if (trackNumberOption) {
@@ -47,9 +53,9 @@ export default class Add extends Interaction<CommandInteraction> {
             player.insert(metadata, trackNumber);
 
             const response =
-                'added track: ' +
-                `[${metadata[0].title}](${metadata[0].url}) ` +
-                `(${metadata[0].durationRaw}), ` +
+                `searching for ${query}\n` +
+                `found ${tracklist}` +
+                `enqueuing ${metadata.length} tracks at position: ${trackNumber}, ` +
                 `requested by ${member.displayName}`;
             await interaction.editReply(response);
         } else {
@@ -65,9 +71,9 @@ export default class Add extends Interaction<CommandInteraction> {
             player.connect(voiceChannel, memberChannel);
             const track = await player.add(metadata);
             await interaction.editReply(
-                `added track to #${track}: ` +
-                    `[${metadata[0].title}](${metadata[0].url}) ` +
-                    `(${metadata[0].durationRaw}), ` +
+                `searching for ${query}\n` +
+                    `found ${tracklist}` +
+                    `enqueuing ${metadata.length} tracks at position: ${track}, ` +
                     `requested by ${member.displayName}`,
             );
         }

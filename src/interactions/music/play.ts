@@ -49,8 +49,16 @@ export default class Play extends Interaction<CommandInteraction> {
 
             const trackAt = await player.add(metadata);
             // TODO: add something in the message about how many tracks we just queued, maybe playlist info
+            let tracklist = '';
+            metadata.forEach((t, index) => {
+                tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
+                    t.durationRaw
+                })\n`;
+            });
+
             await interaction.editReply(
-                `searching for ${query}, ` +
+                `searching for ${query}\n` +
+                    `found ${tracklist}` +
                     `enqueuing ${metadata.length} tracks at position ${trackAt}, ` +
                     `requested by ${member.displayName}`,
             );
