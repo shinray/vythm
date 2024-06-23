@@ -43,11 +43,13 @@ export default class PlayNow extends Interaction<CommandInteraction> {
             return;
         }
         let tracklist = '';
-        metadata.forEach((t, index) => {
+        metadata.slice(0, 10).forEach((t, index) => {
             tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
                 t.durationRaw
             })\n`;
         });
+        if (metadata.length > 10)
+            tracklist += `...and ${metadata.length - 10} more\n`;
 
         player.connect(voiceChannel, textChannel);
 

@@ -41,11 +41,12 @@ export default class Add extends Interaction<CommandInteraction> {
             return;
         }
         let tracklist = '';
-        metadata.forEach((t, index) => {
-            tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
-                t.durationRaw
-            })\n`;
+        metadata.slice(0, 10).forEach((t, index) => {
+            const trackno = metadata.length > 1 ? `#${index + 1} - ` : null;
+            tracklist += `${trackno}[${t.title}](<${t.url}>) (${t.durationRaw})\n`;
         });
+        if (metadata.length > 10)
+            tracklist += `...and ${metadata.length - 10} more\n`;
 
         const trackNumberOption = interaction.options.get('tracknumber');
         if (trackNumberOption) {

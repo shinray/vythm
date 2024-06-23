@@ -50,11 +50,13 @@ export default class Play extends Interaction<CommandInteraction> {
             const trackAt = await player.add(metadata);
             // TODO: add something in the message about how many tracks we just queued, maybe playlist info
             let tracklist = '';
-            metadata.forEach((t, index) => {
+            metadata.slice(0, 10).forEach((t, index) => {
                 tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
                     t.durationRaw
                 })\n`;
             });
+            if (metadata.length > 10)
+                tracklist += `...and ${metadata.length - 10} more\n`;
 
             await interaction.editReply(
                 `searching for ${query}\n` +

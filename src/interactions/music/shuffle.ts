@@ -1,5 +1,6 @@
 import { CommandInteraction } from 'discord.js';
 import Interaction from '../../models/Interaction';
+import StringBuffer from '../../utils/StringBuffer';
 
 export default class Shuffle extends Interaction<CommandInteraction> {
     name = 'shuffle';
@@ -13,16 +14,19 @@ export default class Shuffle extends Interaction<CommandInteraction> {
 
         const tracklist = player.shuffle();
 
-        let response = 'New tracklist: \n';
+        // TODO: this just overwrites itself. Temp solution to stop crashes.
+        const response = new StringBuffer(2000);
+
+        response.addLine('New tracklist:');
 
         // TODO: need pagination.
         // Actually, should this even return anything? Mostly put this for debug.
         tracklist.forEach((track, index) => {
-            response += `#${index + 1} - ${track.title} (${
-                track.durationRaw
-            })\n`;
+            response.addLine(
+                `#${index + 1} - ${track.title} (${track.durationRaw})`,
+            );
         });
 
-        await interaction.editReply(response);
+        await interaction.editReply(response.toString());
     };
 }

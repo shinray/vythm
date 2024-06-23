@@ -18,6 +18,7 @@ export default class Remove extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
 
+        // TODO: support a range rather than just a single index
         const trackNumber = interaction.options.get(this.options[0].name, true)
             .value as number;
 
