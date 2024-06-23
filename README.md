@@ -19,7 +19,7 @@ Place token in `src/config.json`
 
 uses lint-staged, airbnb rules, prettier
 
-targets node 16+ (tested with node 20 LTS)
+targets node 16+ (tested with node 20 LTS), built using yarn
 
 Client Structure: Handlers read folders and load modules by filename All events
 are emitted by Client and need to be handled with an event handler
