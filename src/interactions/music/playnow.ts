@@ -44,9 +44,8 @@ export default class PlayNow extends Interaction<CommandInteraction> {
         }
         let tracklist = '';
         metadata.slice(0, 10).forEach((t, index) => {
-            tracklist += `#${index + 1} - [${t.title}](<${t.url}>) (${
-                t.durationRaw
-            })\n`;
+            const trackno = metadata.length > 1 ? `#${index + 1} - ` : null;
+            tracklist += `${trackno}[${t.title}](<${t.url}>) (${t.durationRaw})\n`;
         });
         if (metadata.length > 10)
             tracklist += `...and ${metadata.length - 10} more\n`;
