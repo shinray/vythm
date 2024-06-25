@@ -18,13 +18,16 @@ export default class Remove extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
 
+        // TODO: support a range rather than just a single index
         const trackNumber = interaction.options.get(this.options[0].name, true)
             .value as number;
 
         const track = player.remove(trackNumber);
         let response;
         if (track)
-            response = `removed ${track.title} from position ${trackNumber}`;
+            response =
+                `removed [${track.title}](<${track.url}>)` +
+                `(${track.durationRaw}) from position ${trackNumber}`;
         else response = `There was a problem removing track ${trackNumber}`;
 
         await interaction.editReply(response);

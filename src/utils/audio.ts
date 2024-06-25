@@ -1,9 +1,4 @@
-/* eslint @typescript-eslint/no-explicit-any: "warn" */
-/* eslint @typescript-eslint/no-redundant-type-constituents: "warn" */
-/* eslint @typescript-eslint/no-unsafe-member-access: "warn" */
-/* eslint @typescript-eslint/no-unsafe-argument: "warn" */
-/* eslint @typescript-eslint/no-unsafe-assignment: "warn" */
-// TODO: fix typescript explicit any. Right now, we're only expecting youtube urls...
+// TODO: create a unified type to support more than YT videos...
 // in fact, try and genericize this such that it accepts all the types play-dl supports...
 // takes URL and quality
 
@@ -19,10 +14,9 @@ import { StreamQuality } from '../types/StreamQuality';
  * @returns AudioResource object
  */
 export const createStream = async (
-    metadata: play.YouTubeVideo | any,
+    metadata: play.YouTubeVideo,
     options: StreamOptions = { quality: StreamQuality.LOWEST },
-): Promise<AudioResource<any>> => {
-    console.debug('Create Stream!', metadata?.url);
+): Promise<AudioResource<play.YouTubeVideo>> => {
     const streamOptions = options;
     const { stream, type } = await play.stream(metadata.url, streamOptions);
 

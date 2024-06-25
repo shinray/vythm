@@ -16,6 +16,7 @@ import DiscordClient from './client';
 export default class Interaction<T extends BaseInteraction = BaseInteraction> {
     readonly client: DiscordClient;
 
+    // TODO: should these options go in the constructor instead?
     name: string = '';
 
     description: string = 'No description provided.';

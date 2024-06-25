@@ -4,6 +4,7 @@ import {
     SlashCommandIntegerOption,
     SlashCommandStringOption,
     VoiceChannel,
+    TextChannel,
 } from 'discord.js';
 import { search } from '../../services/search';
 import Interaction from '../../models/Interaction';
@@ -39,6 +40,13 @@ export default class Add extends Interaction<CommandInteraction> {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
+        let tracklist = '';
+        metadata.slice(0, 10).forEach((t, index) => {
+            const trackno = metadata.length > 1 ? `#${index + 1} - ` : null;
+            tracklist += `${trackno}[${t.title}](<${t.url}>) (${t.durationRaw})\n`;
+        });
+        if (metadata.length > 10)
+            tracklist += `...and ${metadata.length - 10} more\n`;
 
         const trackNumberOption = interaction.options.get('tracknumber');
         if (trackNumberOption) {
@@ -46,14 +54,14 @@ export default class Add extends Interaction<CommandInteraction> {
             player.insert(metadata, trackNumber);
 
             const response =
-                'added track: ' +
-                `[${metadata[0].title}](${metadata[0].url}) ` +
-                `(${metadata[0].durationRaw}), ` +
+                `searching for ${query}\n` +
+                `found ${tracklist}` +
+                `enqueuing ${metadata.length} tracks at position: ${trackNumber}, ` +
                 `requested by ${member.displayName}`;
             await interaction.editReply(response);
         } else {
             // We should assume you want to connect and play.
-            // const memberChannel = interaction.channel as TextChannel;
+            const memberChannel = interaction.channel as TextChannel;
             const voiceChannel = member.voice.channel as VoiceChannel;
             if (!voiceChannel) {
                 await interaction.editReply(
@@ -61,12 +69,12 @@ export default class Add extends Interaction<CommandInteraction> {
                 );
                 return;
             }
-            player.connect(voiceChannel);
+            player.connect(voiceChannel, memberChannel);
             const track = await player.add(metadata);
             await interaction.editReply(
-                `added track to #${track}:` +
-                    `[${metadata[0].title}](${metadata[0].url}) ` +
-                    `(${metadata[0].durationRaw}), ` +
+                `searching for ${query}\n` +
+                    `found ${tracklist}` +
+                    `enqueuing ${metadata.length} tracks at position: ${track}, ` +
                     `requested by ${member.displayName}`,
             );
         }

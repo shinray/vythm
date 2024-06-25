@@ -7,10 +7,10 @@ import MusicPlayer from '../models/MusicPlayer';
 import DiscordClient from '../models/client';
 
 /**
- * Handles different instances of MusicPlayer.
+ * MusicPlayer factory, returns a player instance (per guild) on request
  */
 export default class MusicHandler extends Collection<string, MusicPlayer> {
-    readonly client: DiscordClient;
+    private readonly client: DiscordClient;
 
     constructor(client: DiscordClient) {
         super();
