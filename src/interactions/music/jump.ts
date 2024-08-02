@@ -47,7 +47,8 @@ export default class Jump extends Interaction<CommandInteraction> {
         if (newTrack) {
             response =
                 'skipping track!\n' +
-                `jumping to ${trackNumber}\n` +
+                `jumping to #${trackNumber} - [${newTrack.title}](<${newTrack.url}>) ` +
+                `(${newTrack.durationRaw})\n` +
                 `requested by ${member.displayName}`;
         } else {
             response = "couldn't jump, sorry!";
