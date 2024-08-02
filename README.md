@@ -39,7 +39,6 @@ are emitted by Client and need to be handled with an event handler
 -   maybe add other features too? time to resurrect xkcd-thief
 -   investigate other stream downloader backends, since play-dl may not be
     actively developed
--   fix yarn/npm confusion
 -   fix tslint/eslint confusion
 -   setup a real logger instead of this console.log stuff
 -   clean up comments
@@ -47,4 +46,3 @@ are emitted by Client and need to be handled with an event handler
 -   set up dotenv for secrets
 -   add unit testing
 -   dockerize!
--   deploy to shinray's raspi

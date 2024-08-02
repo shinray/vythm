@@ -51,7 +51,7 @@ export default class Play extends Interaction<CommandInteraction> {
             // TODO: add something in the message about how many tracks we just queued, maybe playlist info
             let tracklist = '';
             metadata.slice(0, 10).forEach((t, index) => {
-                const trackno = metadata.length > 1 ? `#${index + 1} - ` : null;
+                const trackno = metadata.length > 1 ? `#${index + 1} - ` : '';
                 tracklist += `${trackno}[${t.title}](<${t.url}>) (${t.durationRaw})\n`;
             });
             if (metadata.length > 10)
