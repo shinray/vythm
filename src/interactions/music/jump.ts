@@ -1,0 +1,57 @@
+import {
+    CommandInteraction,
+    GuildMember,
+    SlashCommandIntegerOption,
+    TextChannel,
+    VoiceChannel,
+} from 'discord.js';
+import Interaction from '../../models/Interaction';
+
+export default class Jump extends Interaction<CommandInteraction> {
+    name = 'jump';
+
+    description = 'Change the current track';
+
+    options = [
+        new SlashCommandIntegerOption()
+            .setName('tracknumber')
+            .setDescription('Enter the track number you want to jump to.')
+            .setRequired(true),
+    ];
+
+    execute = async (interaction: CommandInteraction) => {
+        const player = this.client.musicPlayers.getOrCreate(
+            interaction.guildId!,
+        );
+        const member = interaction.member as GuildMember;
+        // This one we'll require the user be in voice.
+        const memberChannel = interaction.channel as TextChannel;
+        const voiceChannel = member.voice.channel as VoiceChannel;
+        if (!voiceChannel) {
+            await interaction.editReply(
+                "I'm too shy, I can't join on my own! You must be in a voice channel!",
+            );
+            return;
+        }
+        player.connect(voiceChannel, memberChannel);
+
+        const trackNumberOption = interaction.options.get(
+            this.options[0].name,
+            true,
+        );
+        const trackNumber = trackNumberOption?.value as number;
+
+        const newTrack = await player.skip(trackNumber, true);
+
+        let response = 'skipping track!';
+        if (newTrack) {
+            response =
+                'skipping track!\n' +
+                `jumping to ${trackNumber}\n` +
+                `requested by ${member.displayName}`;
+        } else {
+            response = "couldn't jump, sorry!";
+        }
+        await interaction.editReply(response);
+    };
+}
