@@ -46,7 +46,11 @@ export default class MusicPlayer extends AudioPlayer {
     private lastKnownTextChannel: TextChannel | undefined; // text channel the bot talks in.
     // going to assume to use the last textchannel that a command was issued from.
 
-    private voiceChannelId: string | undefined;
+    private _voiceChannelId: string | undefined;
+
+    public get voiceChannelId(): string | undefined {
+        return this._voiceChannelId;
+    }
 
     private connection: VoiceConnection | undefined;
 
@@ -93,12 +97,12 @@ export default class MusicPlayer extends AudioPlayer {
      */
     connect = (voiceChannel: VoiceChannel, textChannel?: TextChannel): void => {
         // Dedupe
-        if (this.voiceChannelId === voiceChannel.id) return;
-        this.voiceChannelId = voiceChannel.id;
+        if (this._voiceChannelId === voiceChannel.id) return;
+        this._voiceChannelId = voiceChannel.id;
         if (textChannel) this.lastKnownTextChannel = textChannel;
         this.connection = joinVoiceChannel({
             guildId: this.guildId,
-            channelId: this.voiceChannelId,
+            channelId: this._voiceChannelId,
             adapterCreator: voiceChannel.guild.voiceAdapterCreator,
         });
         this.connection.subscribe(this); // Can technically subscribe to multiple
@@ -115,7 +119,7 @@ export default class MusicPlayer extends AudioPlayer {
     disconnect = (): void => {
         this.connection?.destroy();
         this.connection = undefined;
-        this.voiceChannelId = undefined;
+        this._voiceChannelId = undefined;
     };
 
     /**
