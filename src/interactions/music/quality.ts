@@ -6,6 +6,8 @@ import {
 import Interaction from '../../models/Interaction';
 import { StreamQuality } from '../../types/StreamQuality';
 
+const QUALITYARG = 'quality';
+
 export default class Quality extends Interaction<CommandInteraction> {
     name = 'quality';
 
@@ -13,7 +15,7 @@ export default class Quality extends Interaction<CommandInteraction> {
 
     options = [
         new SlashCommandIntegerOption()
-            .setName('quality')
+            .setName(QUALITYARG)
             .setDescription('Enter a number from 0-2')
             .setRequired(true),
     ];
@@ -24,12 +26,11 @@ export default class Quality extends Interaction<CommandInteraction> {
         );
         const member = interaction.member as GuildMember;
 
-        const qualityOption = interaction.options.get(
-            this.options[0].name,
-            true,
-        );
-        const quality = (qualityOption?.value ??
-            StreamQuality.LOWEST) as StreamQuality;
+        const qualityOption = interaction.options.get(QUALITYARG, true);
+        const qualityValue = qualityOption?.value as number;
+        const quality = Object.values(StreamQuality).includes(qualityValue)
+            ? (qualityValue as StreamQuality)
+            : StreamQuality.LOWEST;
 
         player.setQuality(quality);
 
