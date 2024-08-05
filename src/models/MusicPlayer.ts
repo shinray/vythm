@@ -36,6 +36,7 @@ import DiscordClient from './client';
 import { LoopMode } from '../types/LoopMode';
 import { StreamQuality } from '../types/StreamQuality';
 import { createStream } from '../utils/audio';
+import { shuffleInPlace } from '../utils/shuffle';
 
 export default class MusicPlayer extends AudioPlayer {
     readonly client: DiscordClient;
@@ -55,7 +56,7 @@ export default class MusicPlayer extends AudioPlayer {
         return this._tracks;
     }
 
-    // Track position index. One-based index, vs tracks[] zero-based
+    /** Track position index. One-based index, vs tracks[] zero-based */
     private _trackAt: number = 0;
 
     public get trackAt(): number {
@@ -184,8 +185,6 @@ export default class MusicPlayer extends AudioPlayer {
      * @returns {number} next track position
      */
     insertNext = (track: YouTubeVideo[]): number => {
-        // index is zero based, but conveniently, we want the next track anyway
-        // so trackAt += 1; trackAt -=1, balances out
         this.insert(track, this._trackAt + 1);
         return this._trackAt + 1;
     };
@@ -327,25 +326,33 @@ export default class MusicPlayer extends AudioPlayer {
 
     /**
      * Shuffles the current tracklist
+     * @param {number} [startPosition] Optional - starting position to shuffle from
+     * @param {number} [endPosition] Optional - end position to stop shuffling
      * @returns {YouTubeVideo[]} the current playlist
      */
-    shuffle = (): YouTubeVideo[] => {
-        // Fisher-Yates algorithm
-        for (let i = this._tracks.length - 1; i > 0; i -= 1) {
-            // Generate a random index between 0 and i, inclusive
-            const j = Math.floor(Math.random() * (i + 1));
-            // Swap the elements at indices i and j
-            [this._tracks[i], this._tracks[j]] = [
-                this._tracks[j],
-                this._tracks[i],
-            ];
-            // Update track index, if necessary
+    shuffle = (
+        startPosition?: number,
+        endPosition?: number,
+    ): YouTubeVideo[] => {
+        // Convert human-friendly indices to computer versions
+        const start = (startPosition ?? 1) - 1;
+        const end = (endPosition ?? this._tracks.length) - 1;
+
+        /**
+         * When shuffling tracklist, keep _trackAt in sync if it moves.
+         * @param {number} i index of the first element
+         * @param {number} j index of the second element
+         */
+        const keepTrackPositionUpdated = (i: number, j: number) => {
             if (this._trackAt === i + 1) {
                 this._trackAt = j + 1;
             } else if (this._trackAt === j + 1) {
                 this._trackAt = i + 1;
             }
-        }
+        };
+
+        shuffleInPlace(this._tracks, start, end, keepTrackPositionUpdated);
+
         return this._tracks;
     };
 
