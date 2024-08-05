@@ -1,6 +1,8 @@
 import { CommandInteraction, SlashCommandIntegerOption } from 'discord.js';
 import Interaction from '../../models/Interaction';
 
+const TRACKNOARG = 'tracknumber';
+
 export default class Remove extends Interaction<CommandInteraction> {
     name = 'remove';
 
@@ -8,7 +10,7 @@ export default class Remove extends Interaction<CommandInteraction> {
 
     options = [
         new SlashCommandIntegerOption()
-            .setName('tracknumber')
+            .setName(TRACKNOARG)
             .setDescription('Enter the number of the track you want to remove')
             .setRequired(true),
     ];
@@ -19,7 +21,7 @@ export default class Remove extends Interaction<CommandInteraction> {
         );
 
         // TODO: support a range rather than just a single index
-        const trackNumber = interaction.options.get(this.options[0].name, true)
+        const trackNumber = interaction.options.get(TRACKNOARG, true)
             .value as number;
 
         const track = player.remove(trackNumber);

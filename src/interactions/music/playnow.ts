@@ -1,12 +1,17 @@
 import {
     CommandInteraction,
     GuildMember,
+    SlashCommandBooleanOption,
     SlashCommandStringOption,
     TextChannel,
     VoiceChannel,
 } from 'discord.js';
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
+import { shuffleInPlace } from '../../utils/shuffle';
+
+const QUERYARG = 'query';
+const SHUFFLEARG = 'shuffleplaylist';
 
 export default class PlayNow extends Interaction<CommandInteraction> {
     name = 'playnow';
@@ -15,9 +20,15 @@ export default class PlayNow extends Interaction<CommandInteraction> {
 
     options = [
         new SlashCommandStringOption()
-            .setName('query')
+            .setName(QUERYARG)
             .setDescription('Enter keyword or youtube url.')
             .setRequired(true),
+        new SlashCommandBooleanOption()
+            .setName(SHUFFLEARG)
+            .setDescription(
+                'If the query is a playlist, shuffle it before queueing',
+            )
+            .setRequired(false),
     ];
 
     execute = async (interaction: CommandInteraction) => {
@@ -35,13 +46,19 @@ export default class PlayNow extends Interaction<CommandInteraction> {
             return;
         }
 
-        const query = interaction.options.get(this.options[0].name, true)
-            .value as string;
+        const query = interaction.options.get(QUERYARG, true).value as string;
         const metadata = await search(query);
         if (!metadata?.length) {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
+
+        const shuffleOption = interaction.options.get(SHUFFLEARG, false);
+        const shuffleValue: boolean | undefined =
+            (shuffleOption?.value as boolean) ?? undefined;
+
+        if (shuffleValue) shuffleInPlace(metadata);
+
         let tracklist = '';
         metadata.slice(0, 10).forEach((t, index) => {
             const trackno = metadata.length > 1 ? `#${index + 1} - ` : '';

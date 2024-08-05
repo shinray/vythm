@@ -7,6 +7,8 @@ import {
 } from 'discord.js';
 import Interaction from '../../models/Interaction';
 
+const TRACKNOARG = 'tracknumber';
+
 export default class Jump extends Interaction<CommandInteraction> {
     name = 'jump';
 
@@ -14,7 +16,7 @@ export default class Jump extends Interaction<CommandInteraction> {
 
     options = [
         new SlashCommandIntegerOption()
-            .setName('tracknumber')
+            .setName(TRACKNOARG)
             .setDescription('Enter the track number you want to jump to.')
             .setRequired(true),
     ];
@@ -35,10 +37,7 @@ export default class Jump extends Interaction<CommandInteraction> {
         }
         player.connect(voiceChannel, memberChannel);
 
-        const trackNumberOption = interaction.options.get(
-            this.options[0].name,
-            true,
-        );
+        const trackNumberOption = interaction.options.get(TRACKNOARG, true);
         const trackNumber = trackNumberOption?.value as number;
 
         const newTrack = await player.skip(trackNumber, true);
