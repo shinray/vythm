@@ -1,12 +1,18 @@
 import {
     CommandInteraction,
     GuildMember,
+    SlashCommandBooleanOption,
     SlashCommandStringOption,
+    TextChannel,
     VoiceChannel,
 } from 'discord.js';
 import { AudioPlayerStatus } from '@discordjs/voice';
 import Interaction from '../../models/Interaction';
 import { search } from '../../services/search';
+import { shuffleInPlace } from '../../utils/shuffle';
+
+const QUERYARG = 'query';
+const SHUFFLEARG = 'shuffleplaylist';
 
 export default class PlayNext extends Interaction<CommandInteraction> {
     name = 'playnext';
@@ -15,9 +21,15 @@ export default class PlayNext extends Interaction<CommandInteraction> {
 
     options = [
         new SlashCommandStringOption()
-            .setName('query')
+            .setName(QUERYARG)
             .setDescription('Enter keyword or youtube url.')
             .setRequired(true),
+        new SlashCommandBooleanOption()
+            .setName(SHUFFLEARG)
+            .setDescription(
+                'If the query is a playlist, shuffle it before queueing',
+            )
+            .setRequired(false),
     ];
 
     execute = async (interaction: CommandInteraction) => {
@@ -25,6 +37,7 @@ export default class PlayNext extends Interaction<CommandInteraction> {
             interaction.guildId!,
         );
         const member = interaction.member as GuildMember;
+        const textChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
         if (!voiceChannel) {
             await interaction.editReply(
@@ -33,30 +46,39 @@ export default class PlayNext extends Interaction<CommandInteraction> {
             return;
         }
 
-        const query = interaction.options.get(this.options[0].name, true)
-            .value as string;
+        const query = interaction.options.get(QUERYARG, true).value as string;
         const metadata = await search(query);
         if (!metadata?.length) {
             await interaction.editReply(`no results for query ${query}`);
             return;
         }
 
-        player.connect(voiceChannel);
+        const shuffleOption = interaction.options.get(SHUFFLEARG, false);
+        const shuffleValue: boolean | undefined =
+            (shuffleOption?.value as boolean) ?? undefined;
+
+        if (shuffleValue) shuffleInPlace(metadata);
+
+        let tracklist = '';
+        metadata.slice(0, 10).forEach((t, index) => {
+            const trackno = metadata.length > 1 ? `#${index + 1} - ` : '';
+            tracklist += `${trackno}[${t.title}](<${t.url}>) (${t.durationRaw})\n`;
+        });
+        if (metadata.length > 10)
+            tracklist += `...and ${metadata.length - 10} more\n`;
+
+        player.connect(voiceChannel, textChannel);
 
         const nextTrackAt = player.insertNext(metadata);
         if (player.state.status === AudioPlayerStatus.Idle) {
-            const track = await player.skip(nextTrackAt);
-            await interaction.editReply(
-                `now playing #${nextTrackAt}: ` +
-                    `[${track?.title}](${track?.url}) ` +
-                    `(${track?.durationRaw}), ` +
-                    `requested by ${member.displayName}`,
-            );
-            return;
+            await player.skip(nextTrackAt);
         }
 
         await interaction.editReply(
-            `inserted ${metadata[0].title} at position ${nextTrackAt}, `,
+            `searching for ${query}\n` +
+                `found ${tracklist}` +
+                `enqueuing ${metadata.length} tracks at position ${nextTrackAt}, ` +
+                `requested by ${member.displayName}`,
         );
     };
 }

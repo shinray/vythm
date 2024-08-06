@@ -55,8 +55,7 @@ export default class InteractionHandler extends Collection<
      * This is what allows Discord to describe slash commands to the user.
      */
     deploy = async () => {
-        const config: VythmConfig = configJson;
-        const { token, clientId, guildId } = config;
+        const { token, clientId, guildId }: VythmConfig = configJson;
         // TODO: make api call to register all commands
         // registerCommands(this);
         const body = this.map((c) => c.toJSON());

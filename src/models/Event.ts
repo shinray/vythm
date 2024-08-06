@@ -15,7 +15,7 @@ export default class DiscordEvent {
      * @param _args Arguments to pass to script.
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    execute = (..._args: unknown[]): Promise<void> => {
+    execute = (..._args: unknown[]): void => {
         console.error(
             `Attempted to call execute() on an Event with no implementation ${this.name}`,
         );

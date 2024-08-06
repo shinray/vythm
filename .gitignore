@@ -3,3 +3,4 @@ node_modules/
 # config.json # I'll actually commit it, at least initially.
 dist/
 # *.js
+assets/lego-yoda-death-sound-effect.mp3
