@@ -15,12 +15,15 @@
     "author": "skuo",
     "license": "ISC",
     "dependencies": {
+        "@discord-player/extractor": "^7.1.0",
         "@discordjs/voice": "^0.16.1",
+        "discord-player": "^7.1.0",
+        "discord-player-youtubei": "^1.4.1",
         "discord.js": "^14.11.0",
         "ffmpeg-static": "^5.2.0",
         "install-peerdeps": "^3.0.3",
         "libsodium-wrappers": "^0.7.13",
-        "play-dl": "shinray/play-dl#dist"
+        "mediaplex": "^1.0.0"
     },
     "devDependencies": {
         "@babel/core": "^7.22.9",

@@ -2,7 +2,7 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import configJson from '../config.json';
 import InteractionHandler from '../handlers/interactionHandler';
 import EventHandler from '../handlers/eventHandler';
-import MusicHandler from '../handlers/musicHandler';
+// import MusicHandler from '../handlers/musicHandler';
 import { VythmConfig } from '../types/definitions';
 
 export default class DiscordClient extends Client {
@@ -16,7 +16,7 @@ export default class DiscordClient extends Client {
     public interactions = new InteractionHandler(this);
 
     // Active music clients (one per guild)
-    public musicPlayers = new MusicHandler(this);
+    // public musicPlayers = new MusicHandler(this);
 
     constructor() {
         super({

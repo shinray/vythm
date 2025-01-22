@@ -4,10 +4,12 @@ A discord bot in Node.js
 
 ## Requirements
 
--   Node 16+
+-   Node 20
 -   Discord.js
     -   @discordjs/voice
--   play-dl
+-   discord-player
+-   discord-player-youtubei
+-   mediaplex
 -   libsodium-wrappers
 -   ffmpeg-static
 
