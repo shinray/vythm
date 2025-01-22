@@ -75,24 +75,5 @@ export default class InteractionHandler extends Collection<
         } catch (e) {
             console.error('Error registering commands to API ', e);
         }
-
-        // const globalCommandsToDelete = [
-        //     '1173887402213904407',
-        //     '1173578501379596348',
-        //     '1173917691401207849',
-        // ];
-
-        // try {
-        //     console.log('Deleting old commands');
-        //     globalCommandsToDelete.map(async (cmd) => {
-        //         console.log(`--Deleting command id ${cmd}`);
-        //         const response = await rest.delete(
-        //             Routes.applicationCommand(clientId, cmd),
-        //         );
-        //         console.debug('Discord delete API response', response);
-        //     });
-        // } catch (e) {
-        //     console.error('Error deleting commands from API ', e);
-        // }
     };
 }
