@@ -1,4 +1,3 @@
-import * as play from 'play-dl';
 import DiscordEvent from '../models/Event';
 import DiscordClient from '../models/client';
 import { StreamQuality } from './StreamQuality';
@@ -33,11 +32,6 @@ export type PlayValidation =
     | 'yt_playlist'
     | 'search'
     | false;
-
-// This is probably a terrible idea and I will definitely regret this in the future
-export interface Track extends play.YouTubeVideo {
-    trackType: string;
-}
 
 export interface VythmConfig {
     token: string;
