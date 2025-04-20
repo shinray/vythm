@@ -1,6 +1,6 @@
 node_modules/
 .env
-# config.json # I'll actually commit it, at least initially.
+config.json
 dist/
 # *.js
 assets/lego-yoda-death-sound-effect.mp3
