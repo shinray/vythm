@@ -21,6 +21,7 @@ export default class Next extends Interaction<CommandInteraction> {
             await interaction.editReply(
                 "I'm too shy, I can't join on my own! You must be in a voice channel!",
             );
+            return;
         }
 
         if (!queue || queueLength < 1) {
