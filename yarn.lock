@@ -2263,15 +2263,16 @@ discord-api-types@0.37.83:
   resolved "https://registry.npmjs.org/discord-api-types/-/discord-api-types-0.37.83.tgz"
   integrity sha512-urGGYeWtWNYMKnYlZnOnDHm8fVRffQs3U0SpE8RHeiuLKb/u92APS8HoQnPTFbnXmY1vVnXjXO4dOxcAn3J+DA==
 
-discord-player-youtubei@1.4.5:
-  version "1.4.5"
-  resolved "https://registry.yarnpkg.com/discord-player-youtubei/-/discord-player-youtubei-1.4.5.tgz#e5349f2e01ae1d131deb471dd8a84718a3132e4d"
-  integrity sha512-IN9MSrECnCJLMs9GjD2oVyXKL1OFtZ0rQHidUUVOFzLoAY5cktzE+4exoquyQTk+NKtUygOX7ihcRmVPktOqJA==
+discord-player-youtubei@^1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/discord-player-youtubei/-/discord-player-youtubei-1.4.6.tgz#0216a694d93c78e624b282f52ec9762f7da1e342"
+  integrity sha512-LM8nSrJkIGYUj6oQsce6vi/rxxkp6AaJgy3m5uE4foSRotPmfkPRNo/tidoddTezlyaI/Qnz9qgCQNmbA43AYA==
   dependencies:
-    jsdom "^26.0.0"
+    bgutils-js "^3.2.0"
+    jsdom "^26.1.0"
     tiny-typed-emitter "^2.1.0"
     undici "^7.1.0"
-    youtubei.js "^13.2.0"
+    youtubei.js "^13.4.0"
 
 discord-player@^7.1.0:
   version "7.1.0"
@@ -3497,10 +3498,10 @@ jackspeak@^3.1.2:
   optionalDependencies:
     "@pkgjs/parseargs" "^0.11.0"
 
-jintr@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.npmjs.org/jintr/-/jintr-3.3.0.tgz"
-  integrity sha512-ZsaajJ4Hr5XR0tSPhOZOTjFhxA0qscKNSOs41NRjx7ZOGwpfdp8NKIBEUtvUPbA37JXyv1sJlgeOOZHjr3h76Q==
+jintr@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/jintr/-/jintr-3.3.1.tgz#b88355af0c66603130b12d54721b8ab1d3be0b98"
+  integrity sha512-nnOzyhf0SLpbWuZ270Omwbj5LcXUkTcZkVnK8/veJXtSZOiATM5gMZMdmzN75FmTyj+NVgrGaPdH12zIJ24oIA==
   dependencies:
     acorn "^8.8.0"
 
@@ -3521,9 +3522,9 @@ js-yaml@^4.1.0:
   dependencies:
     argparse "^2.0.1"
 
-jsdom@^26.0.0:
+jsdom@^26.1.0:
   version "26.1.0"
-  resolved "https://registry.npmjs.org/jsdom/-/jsdom-26.1.0.tgz"
+  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-26.1.0.tgz#ab5f1c1cafc04bd878725490974ea5e8bf0c72b3"
   integrity sha512-Cvc9WUhxSMEo4McES3P7oK3QaXldCfNWp7pl2NNeiIFlCoLr3kfq9kb1fxftiwk1FLV7CvpvDfonxtzUDeSOPg==
   dependencies:
     cssstyle "^4.2.1"
@@ -5324,12 +5325,12 @@ yocto-queue@^0.1.0:
   resolved "https://registry.npmjs.org/yocto-queue/-/yocto-queue-0.1.0.tgz"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
 
-youtubei.js@^13.2.0:
-  version "13.3.0"
-  resolved "https://registry.npmjs.org/youtubei.js/-/youtubei.js-13.3.0.tgz"
-  integrity sha512-tbl7rxltpgKoSsmfGUe9JqWUAzv6HFLqrOn0N85EbTn5DLt24EXrjClnXdxyr3PBARMJ3LC4vbll100a0ABsYw==
+youtubei.js@^13.4.0:
+  version "13.4.0"
+  resolved "https://registry.yarnpkg.com/youtubei.js/-/youtubei.js-13.4.0.tgz#1f52d7ed0ccabd5ba718eede84771aa32683d9e2"
+  integrity sha512-+fmIZU/dWAjsROONrASy1REwVpy6umAPVuoNLr/4iNmZXl84LyBef0n3hrd1Vn9035EuINToGyQcBmifwUEemA==
   dependencies:
     "@bufbuild/protobuf" "^2.0.0"
-    jintr "^3.3.0"
+    jintr "^3.3.1"
     tslib "^2.5.0"
     undici "^5.19.1"
