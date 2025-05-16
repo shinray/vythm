@@ -11,7 +11,7 @@ export default class Next extends Interaction<CommandInteraction> {
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        const queue = useQueue(interaction.guild!);
+        const queue = useQueue();
         const queueLength = queue?.getSize() || 0;
 
         const member = interaction.member as GuildMember;

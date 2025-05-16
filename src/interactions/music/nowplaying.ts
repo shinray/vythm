@@ -11,7 +11,7 @@ export default class NowPlaying extends Interaction<CommandInteraction> {
 
     // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        const queue = useQueue(interaction.guild!);
+        const queue = useQueue();
 
         if (!queue) {
             await interaction.editReply('Nope!');
