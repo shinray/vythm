@@ -44,7 +44,10 @@ export default class EventHandler extends Collection<string, DiscordEvent> {
                         (...args: unknown[]) => event.execute(...args),
                     );
                 } else {
-                    console.error(`Error loading event ${file}`);
+                    console.error(
+                        '\x1b[33m%s\x1b[0m',
+                        `Error loading event ${file}`,
+                    );
                 }
             }),
         );

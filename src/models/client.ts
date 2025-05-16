@@ -15,9 +15,6 @@ export default class DiscordClient extends Client {
 
     public interactions = new InteractionHandler(this);
 
-    // Active music clients (one per guild)
-    // public musicPlayers = new MusicHandler(this);
-
     constructor() {
         super({
             intents: [
@@ -39,7 +36,11 @@ export default class DiscordClient extends Client {
                 console.debug('Initialized EventHandler');
             })
             .catch((error) => {
-                console.error('Error initializing EventHandler', error);
+                console.error(
+                    '\x1b[31m%s\x1b[0m',
+                    'Error initializing EventHandler',
+                    error,
+                );
             });
         this.interactions
             .init()
@@ -47,14 +48,22 @@ export default class DiscordClient extends Client {
                 console.debug('Initialized InteractionHandler');
             })
             .catch((error) => {
-                console.error('Error initializing InteractionHandler', error);
+                console.error(
+                    '\x1b[31m%s\x1b[0m',
+                    'Error initializing InteractionHandler',
+                    error,
+                );
             });
         this.login(token)
             .then(() => {
                 console.log('Login successful.');
             })
             .catch((error) => {
-                console.error('Error on client login: ', error);
+                console.error(
+                    '\x1b[31m%s\x1b[0m',
+                    'Error on client login: ',
+                    error,
+                );
             });
     };
 }

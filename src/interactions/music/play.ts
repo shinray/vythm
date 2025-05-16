@@ -1,6 +1,7 @@
 import {
     CommandInteraction,
     GuildMember,
+    // SlashCommandBooleanOption,
     SlashCommandStringOption,
     TextChannel,
     VoiceChannel,
@@ -18,6 +19,10 @@ export default class Play extends Interaction<CommandInteraction> {
             .setName('query')
             .setDescription('Enter keyword or youtube url.')
             .setRequired(true),
+        // new SlashCommandBooleanOption()
+        //     .setName('shuffleplaylist')
+        //     .setDescription('Shuffle YT playlists BEFORE queueing')
+        //     .setRequired(false),
     ];
 
     // eslint-disable-next-line class-methods-use-this
@@ -40,13 +45,16 @@ export default class Play extends Interaction<CommandInteraction> {
             const result = await player.play(voiceChannel, query, {
                 nodeOptions: {
                     metadata: { channel: memberChannel },
+                    leaveOnStopCooldown: 10000,
+                    leaveOnEndCooldown: 10000,
+                    selfDeaf: true,
                 },
             });
             await interaction.editReply(
                 `${result.track.title} was added to the queue`,
             );
         } catch (error) {
-            console.error('Error in play command!', error);
+            console.error('\x1b[33m%s\x1b[0m', 'Error in play command!', error);
             await interaction.editReply(
                 `Couldn't play track! ${error as string}`,
             );

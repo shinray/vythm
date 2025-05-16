@@ -44,7 +44,10 @@ export default class InteractionHandler extends Collection<
                     console.debug(`loading command module ${command.name}...`);
                     this.set(command.name, command);
                 } else {
-                    console.error(`Error loading command module ${file}`);
+                    console.error(
+                        '\x1b[33m%s\x1b[0m',
+                        `Error loading command module ${file}`,
+                    );
                 }
             }),
         );
@@ -73,7 +76,11 @@ export default class InteractionHandler extends Collection<
             );
             console.debug('Discord publish API response', response);
         } catch (e) {
-            console.error('Error registering commands to API ', e);
+            console.error(
+                '\x1b[33m%s\x1b[0m',
+                'Error registering commands to API ',
+                e,
+            );
         }
     };
 }
