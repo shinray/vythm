@@ -33,7 +33,8 @@ are emitted by Client and need to be handled with an event handler
 ## TODO
 
 -   Refactor to use discord-player instead
--   Remove bgutils-js dependency (it's supposed to be in discord-player-youtubei, temporarily added it)
+-   Remove bgutils-js dependency (it's supposed to be in
+    discord-player-youtubei, temporarily added it)
 -   create infrastructure for sending messages, instead of writing strings...
 -   extract "is in voice channel" to a decorator, maybe other decorators too
 -   view queue, pagination
