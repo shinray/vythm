@@ -24,12 +24,17 @@ export default class Queue extends Interaction<CommandInteraction> {
 
         // Get the upcoming tracks
         const upcomingTracks = queue?.tracks.toArray().slice(0, 5);
-        console.debug('upconming tracks', upcomingTracks.length);
+        console.debug('upcoming tracks', upcomingTracks.length);
         const queueLength = queue?.tracks.size;
         console.debug('queue length', queueLength);
 
+        // Get history
+        const history = queue.history.tracks.toArray().slice(0, 5);
+        const historyLength = queue.history.tracks.size;
+        console.debug('history length', historyLength);
+
         // Create a message with the current track and upcoming tracks
-        let message = [
+        const message = [
             `**Now Playing:** ${currentTrack?.title} - ${currentTrack?.author}`,
             '',
             '**Upcoming Tracks:**',
@@ -37,12 +42,25 @@ export default class Queue extends Interaction<CommandInteraction> {
                 (track, index) =>
                     `${index + 1}. ${track.title} - ${track.author}`,
             ),
-        ].join('\n');
+        ];
         if (queueLength > upcomingTracks.length) {
-            console.debug('additional tracks');
-            message += `\n...and ${queueLength - upcomingTracks.length} more`;
+            message.push(
+                `\n...and ${queueLength - upcomingTracks.length} more`,
+            );
+        }
+        if (historyLength > 0) {
+            message.unshift(
+                ...[
+                    '**Previous Tracks:**',
+                    ...history.map(
+                        (track, index) =>
+                            `${index + 1}. ${track.title} - ${track.author}`,
+                    ),
+                    '',
+                ],
+            );
         }
 
-        await interaction.editReply(message);
+        await interaction.editReply(message.join('\n'));
     };
 }

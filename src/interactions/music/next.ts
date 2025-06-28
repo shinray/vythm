@@ -24,6 +24,13 @@ export default class Next extends Interaction<CommandInteraction> {
             return;
         }
 
+        if (voiceChannel.id !== queue?.channel?.id) {
+            await interaction.editReply(
+                'You must be in the same channel to use this command.',
+            );
+            return;
+        }
+
         if (!queue) {
             await interaction.editReply('Queue is too small to skip!');
             return;

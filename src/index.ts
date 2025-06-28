@@ -12,10 +12,11 @@ const player = new Player(client);
 // Configure player. TODO: put each into a file and then do another dir parse.
 
 player.events.on('playerStart', async (queue, track) => {
+    let message = `Started playing **[${track.title}](${track.url})** (${track.duration}) - ${track.author}`;
+    if (track.requestedBy)
+        message += `\nRequested by ${track.requestedBy.displayName}`;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-    await queue.metadata.interaction.channel?.send(
-        `Started playing **${track.title}**`,
-    );
+    await queue.metadata.interaction.channel?.send(message);
 });
 
 player.events.on('playerError', (_, e) => console.error('playerError', e));

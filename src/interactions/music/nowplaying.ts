@@ -28,7 +28,6 @@ export default class NowPlaying extends Interaction<CommandInteraction> {
         console.debug('current track', currentTrack);
 
         const embed = new EmbedBuilder();
-        // const node = queue.metadata.interaction.
         const progress = queue.node.createProgressBar();
         embed.setAuthor({
             name: `${queue.currentTrack.title} (${queue.currentTrack.duration}) - ${queue.currentTrack.author}`,
