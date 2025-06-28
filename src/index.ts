@@ -1,6 +1,6 @@
 import { Events } from 'discord.js';
 import { Player } from 'discord-player';
-import { YoutubeiExtractor } from 'discord-player-youtubei';
+import { YoutubeiExtractor, YoutubeiOptions } from 'discord-player-youtubei';
 import DiscordClient from './models/client';
 
 // Initialize client
@@ -23,8 +23,27 @@ player.events.on('playerError', (_, e) => console.error('playerError', e));
 player.events.on('emptyQueue', () => console.debug("Job's done!"));
 
 // Register discord-player extractors
+
+const youtubeiconf: YoutubeiOptions = {
+    generateWithPoToken: true,
+    // useServerAbrStream: true,
+    // overrideBridgeMode: 'yt',
+    // streamOptions: {
+    //     useClient: 'WEB',
+    // },
+    // innertubeConfigRaw: {
+    //     user_agent:
+    //         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0',
+    // },
+    overrideDownloadOptions: {
+        quality: 'bestefficiency',
+        type: 'audio',
+        codec: 'mp4a',
+    },
+};
+
 player.extractors
-    .register(YoutubeiExtractor, {})
+    .register(YoutubeiExtractor, youtubeiconf)
     .then(() => {
         console.debug('Registered youtubeiextractor');
     })
