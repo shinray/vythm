@@ -24,14 +24,11 @@ export default class Queue extends Interaction<CommandInteraction> {
 
         // Get the upcoming tracks
         const upcomingTracks = queue?.tracks.toArray().slice(0, 5);
-        console.debug('upcoming tracks', upcomingTracks.length);
         const queueLength = queue?.tracks.size;
-        console.debug('queue length', queueLength);
 
         // Get history
         const history = queue.history.tracks.toArray().slice(0, 5);
         const historyLength = queue.history.tracks.size;
-        console.debug('history length', historyLength);
 
         // Create a message with the current track and upcoming tracks
         const message = [
