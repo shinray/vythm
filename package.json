@@ -19,7 +19,7 @@
         "@discordjs/voice": "^0.16.1",
         "bgutils-js": "^3.2.0",
         "discord-player": "^7.1.0",
-        "discord-player-youtubei": "^1.4.6",
+        "discord-player-youtubei": "1.5.0",
         "discord.js": "^14.11.0",
         "ffmpeg-static": "^5.2.0",
         "install-peerdeps": "^3.0.3",
