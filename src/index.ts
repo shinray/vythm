@@ -9,6 +9,19 @@ const client = new DiscordClient();
 // Initialize discord-player
 const player = new Player(client);
 
+// Configure player. TODO: put each into a file and then do another dir parse.
+
+player.events.on('playerStart', async (queue, track) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    await queue.metadata.interaction.channel?.send(
+        `Started playing **${track.title}**`,
+    );
+});
+
+player.events.on('playerError', (_, e) => console.error('playerError', e));
+
+player.events.on('emptyQueue', () => console.debug("Job's done!"));
+
 // Register discord-player extractors
 player.extractors
     .register(YoutubeiExtractor, {})
@@ -23,5 +36,8 @@ client.on(Events.InteractionCreate, (interaction) => {
         console.debug(
             `${interaction.user.username}:commandName`,
             interaction.commandName,
+            ...(interaction.options.data.length > 0
+                ? [interaction.options.data]
+                : []),
         );
 });

@@ -3,7 +3,7 @@ import {
     GuildMember,
     // SlashCommandBooleanOption,
     SlashCommandStringOption,
-    TextChannel,
+    // TextChannel,
     VoiceChannel,
 } from 'discord.js';
 import { useMainPlayer } from 'discord-player';
@@ -31,7 +31,7 @@ export default class Play extends Interaction<CommandInteraction> {
         const query = interaction.options.get('query', true).value as string;
 
         const member = interaction.member as GuildMember;
-        const memberChannel = interaction.channel as TextChannel;
+        // const memberTextChannel = interaction.channel as TextChannel;
         const voiceChannel = member.voice.channel as VoiceChannel;
 
         if (!voiceChannel) {
@@ -44,7 +44,7 @@ export default class Play extends Interaction<CommandInteraction> {
         try {
             const result = await player.play(voiceChannel, query, {
                 nodeOptions: {
-                    metadata: { channel: memberChannel },
+                    metadata: { interaction }, // Can insert whatever data you like here.
                     leaveOnStopCooldown: 10000,
                     leaveOnEndCooldown: 10000,
                     selfDeaf: true,
