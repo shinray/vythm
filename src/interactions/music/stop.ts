@@ -19,7 +19,7 @@ export default class Stop extends Interaction<CommandInteraction> {
             await interaction.editReply('Nothing to stop');
         } else if (
             !voiceChannel ||
-            member.voice.channel!.equals(queue.channel!)
+            member.voice.channel?.id !== queue.channel?.id
         ) {
             await interaction.editReply('What are you doing?');
         } else {

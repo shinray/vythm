@@ -24,8 +24,14 @@ export default class Next extends Interaction<CommandInteraction> {
             return;
         }
 
-        if (!queue || queueLength < 1) {
+        if (!queue) {
             await interaction.editReply('Queue is too small to skip!');
+            return;
+        }
+
+        if (queueLength < 1) {
+            queue.node.stop();
+            await interaction.editReply('End of the line!');
             return;
         }
 
