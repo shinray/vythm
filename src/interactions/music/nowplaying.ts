@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js';
+import { CommandInteraction, EmbedBuilder } from 'discord.js';
 import { useQueue } from 'discord-player';
 import Interaction from '../../models/Interaction';
 
@@ -26,6 +26,19 @@ export default class NowPlaying extends Interaction<CommandInteraction> {
         }
 
         console.debug('current track', currentTrack);
-        await interaction.editReply(`Now playing: ${currentTrack.cleanTitle}`);
+
+        const embed = new EmbedBuilder();
+        // const node = queue.metadata.interaction.
+        const progress = queue.node.createProgressBar();
+        embed.setAuthor({
+            name: `${queue.currentTrack.title} (${queue.currentTrack.duration}) - ${queue.currentTrack.author}`,
+            url: queue.currentTrack.url,
+        });
+        embed.setDescription(
+            `${progress}\n\nRequested by: <@${queue.currentTrack.requestedBy?.id}>`,
+        );
+        embed.setThumbnail(queue.currentTrack.thumbnail);
+        // await interaction.editReply(`Now playing: ${currentTrack.cleanTitle}`);
+        await interaction.editReply({ embeds: [embed] });
     };
 }

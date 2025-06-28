@@ -49,6 +49,7 @@ export default class Play extends Interaction<CommandInteraction> {
                     leaveOnEndCooldown: 10000,
                     selfDeaf: true,
                 },
+                requestedBy: interaction.user,
             });
             await interaction.editReply(
                 `${result.track.title} was added to the queue`,
