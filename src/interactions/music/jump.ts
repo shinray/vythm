@@ -13,7 +13,7 @@ export default class Jump extends Interaction<CommandInteraction> {
     name = 'jump';
 
     description =
-        'Jump to track. Deletes n-1 upcoming tracks and plays next track. Note that skipped tracks will not be saved in history.';
+        "Delete n-1 upcoming tracks and plays next track. Note that skipped tracks won't be saved in history.";
 
     options = [
         new SlashCommandIntegerOption()
