@@ -4,10 +4,12 @@ A discord bot in Node.js
 
 ## Requirements
 
--   Node 16+
+-   Node 20
 -   Discord.js
     -   @discordjs/voice
--   play-dl
+-   discord-player
+-   discord-player-youtubei
+-   mediaplex
 -   libsodium-wrappers
 -   ffmpeg-static
 
@@ -30,6 +32,9 @@ are emitted by Client and need to be handled with an event handler
 
 ## TODO
 
+-   Refactor to use discord-player instead
+-   Remove bgutils-js dependency (it's supposed to be in
+    discord-player-youtubei, temporarily added it)
 -   create infrastructure for sending messages, instead of writing strings...
 -   extract "is in voice channel" to a decorator, maybe other decorators too
 -   view queue, pagination

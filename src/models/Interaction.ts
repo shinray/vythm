@@ -28,6 +28,7 @@ export default class Interaction<T extends BaseInteraction = BaseInteraction> {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/require-await
     execute = async (interaction: T): Promise<void> => {
         console.error(
+            '\x1b[31m%s\x1b[0m',
             `Attempted to call execute() on an Interaction with no implementation ${this.name}`,
         );
         throw new Error(`Unsupported operation ${this.name}.`);

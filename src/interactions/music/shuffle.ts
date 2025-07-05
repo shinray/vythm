@@ -1,69 +1,43 @@
-import { CommandInteraction, SlashCommandIntegerOption } from 'discord.js';
+import { CommandInteraction, SlashCommandBooleanOption } from 'discord.js';
+import { useQueue } from 'discord-player';
 import Interaction from '../../models/Interaction';
-import StringBuffer from '../../utils/StringBuffer';
-import { clamp } from '../../utils/ioutils';
-
-const STARTPOSARG = 'start';
-const ENDPOSARG = 'end';
 
 export default class Shuffle extends Interaction<CommandInteraction> {
     name = 'shuffle';
 
-    description = 'Shuffles the current queue';
+    description = 'Toggles shuffling. Takes effect when current track ends.';
 
     options = [
-        new SlashCommandIntegerOption()
-            .setName(STARTPOSARG)
-            .setDescription('Shuffle starting from this position')
-            .setRequired(false),
-        new SlashCommandIntegerOption()
-            .setName(ENDPOSARG)
-            .setDescription('Shuffle ending including this position')
+        new SlashCommandBooleanOption()
+            .setName('dynamic')
+            .setDescription(
+                'Default on. Shuffle when current track ends, without mutating. If off, will mutate entire queue.',
+            )
             .setRequired(false),
     ];
 
+    // eslint-disable-next-line class-methods-use-this
     execute = async (interaction: CommandInteraction) => {
-        const player = this.client.musicPlayers.getOrCreate(
-            interaction.guildId!,
-        );
-        const playlistLength = player.tracks.length;
+        const queue = useQueue();
+        const queueLength = queue?.getSize() || 0;
 
-        // Handle start and end arguments, if they exist.
-        const startOption = interaction.options.get(STARTPOSARG, false);
-        const endOption = interaction.options.get(ENDPOSARG, false);
-        let startIndex: number | undefined;
-        let endIndex: number | undefined;
-        // Clamp inputs to valid indices. Remember, min is 1, max is length.
-        // Shuffle function should internally convert from human to computer indices.
-        if (startOption) {
-            const startValue = startOption.value as number;
-            startIndex = clamp(startValue, 1, playlistLength);
-        }
-        if (endOption) {
-            const endValue = endOption.value as number;
-            // If end is less than start, handle it.
-            if (startOption && (startOption.value as number) > endValue) {
-                endIndex = startOption.value as number;
-            } else {
-                endIndex = clamp(endValue, 1, playlistLength);
-            }
+        if (!queue || queueLength < 2) {
+            await interaction.editReply('Queue is too small to shuffle!');
+            return;
         }
 
-        const tracklist = player.shuffle(startIndex, endIndex);
+        const dynamicMode =
+            (interaction.options.get('dynamic', false)?.value as
+                | boolean
+                | undefined) ?? true;
 
-        // TODO: this just overwrites itself. Temp solution to stop crashes.
-        const response = new StringBuffer(2000);
+        queue.toggleShuffle(dynamicMode);
 
-        response.addLine('New tracklist:');
+        let message = `Toggled shuffle mode to ${queue.isShuffling}.`;
+        if (!dynamicMode) {
+            message += `\nShuffled ${queue.size} tracks in-place!`;
+        }
 
-        // TODO: need pagination.
-        // Actually, should this even return anything? Mostly put this for debug.
-        tracklist.forEach((track, index) => {
-            response.addLine(
-                `#${index + 1} - ${track.title} (${track.durationRaw})`,
-            );
-        });
-
-        await interaction.editReply(response.toString());
+        await interaction.editReply(message);
     };
 }

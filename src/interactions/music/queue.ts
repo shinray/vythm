@@ -1,32 +1,63 @@
-import { CacheType, CommandInteraction } from 'discord.js';
+import { CommandInteraction } from 'discord.js';
+import { useQueue } from 'discord-player';
 import Interaction from '../../models/Interaction';
-import StringBuffer from '../../utils/StringBuffer';
 
 export default class Queue extends Interaction<CommandInteraction> {
     name = 'queue';
 
-    description = 'shows the tracklist, including past and future';
+    description =
+        'Shows the queue. Currently only supports a small slice, yell at the dev to fix this';
 
-    execute = async (interaction: CommandInteraction<CacheType>) => {
-        const { tracks } = this.client.musicPlayers.getOrCreate(
-            interaction.guildId!,
-        );
+    options = [];
 
-        // TODO: this just overwrites itself. Temp solution to stop crashes.
-        const response = new StringBuffer(2000);
+    // eslint-disable-next-line class-methods-use-this
+    execute = async (interaction: CommandInteraction) => {
+        const queue = useQueue();
 
-        response.addLine('Tracklist:');
+        if (!queue) {
+            await interaction.editReply('Empty.');
+            return;
+        }
 
-        if (!tracks.length) response.addLine('none!');
+        // Get the current track
+        const currentTrack = queue?.currentTrack;
 
-        // TODO: this needs pagination. 2K char limit per msg
-        // Plus, buttons would be nice to navigate queue
-        tracks.forEach((t, index) => {
-            response.addLine(
-                `#${index + 1} - [${t.title}](<${t.url}>) (${t.durationRaw})`,
+        // Get the upcoming tracks
+        const upcomingTracks = queue?.tracks.toArray().slice(0, 5);
+        const queueLength = queue?.tracks.size;
+
+        // Get history
+        const history = queue.history.tracks.toArray().slice(0, 5);
+        const historyLength = queue.history.tracks.size;
+
+        // Create a message with the current track and upcoming tracks
+        const message = [
+            `**Now Playing:** ${currentTrack?.title} - ${currentTrack?.author}`,
+            '',
+            '**Upcoming Tracks:**',
+            ...upcomingTracks.map(
+                (track, index) =>
+                    `${index + 1}. ${track.title} - ${track.author}`,
+            ),
+        ];
+        if (queueLength > upcomingTracks.length) {
+            message.push(
+                `\n...and ${queueLength - upcomingTracks.length} more`,
             );
-        });
+        }
+        if (historyLength > 0) {
+            message.unshift(
+                ...[
+                    '**Previous Tracks:**',
+                    ...history.map(
+                        (track, index) =>
+                            `${index + 1}. ${track.title} - ${track.author}`,
+                    ),
+                    '',
+                ],
+            );
+        }
 
-        await interaction.editReply(response.toString());
+        await interaction.editReply(message.join('\n'));
     };
 }

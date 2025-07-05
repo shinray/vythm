@@ -1,4 +1,5 @@
 import { Events, Interaction } from 'discord.js';
+import { useMainPlayer } from 'discord-player';
 import DiscordEvent from '../models/Event';
 
 /**
@@ -13,6 +14,11 @@ export default class InteractionCreate extends DiscordEvent {
 
         await interaction.deferReply();
         const command = this.client.interactions.get(interaction.commandName);
-        await command!.execute(interaction);
+        // Setup discord-player context
+        const player = useMainPlayer();
+        const data = {
+            guild: interaction.guild!,
+        };
+        await player.context.provide(data, () => command?.execute(interaction));
     };
 }

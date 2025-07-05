@@ -25,7 +25,6 @@ export default class Roll extends Interaction<CommandInteraction> {
                 response += '.';
                 break;
         }
-        console.debug(response);
         await interaction.editReply(response);
     };
 }
