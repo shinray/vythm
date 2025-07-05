@@ -1,0 +1,5 @@
+services:
+  vythm:
+    image: "vythm" 
+    volumes:
+      - "<local config.json>:/app/dist/config.json"
